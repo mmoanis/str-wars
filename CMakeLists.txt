@@ -69,7 +69,7 @@ add_executable(data
     common/controls.cpp
 	common/controls.hpp
 )
-target_link_libraries(1DefineTransformationsMatrices
+target_link_libraries(data
 	${ALL_LIBS}
 )
 # Xcode and Visual working directories
