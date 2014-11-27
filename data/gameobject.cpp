@@ -1,4 +1,4 @@
-#include "gameObject.h"
+#include "gameobject.h"
 
 /////////////////////////////////////////////////////////////////////
 GameObject::GameObject(Lane lane, vec3 position, GameObjectType type)
@@ -6,6 +6,10 @@ GameObject::GameObject(Lane lane, vec3 position, GameObjectType type)
     this->_lane = lane;
     this->_objectType = type;
     this->_position = position;
+}
+GameObject::GameObject()
+{
+
 }
 
 GameObject::~GameObject()

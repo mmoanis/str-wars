@@ -15,6 +15,7 @@ class GameObject
 {
 public:
     GameObject(Lane lane, vec3 position, GameObjectType type);
+    GameObject();
     virtual ~GameObject();
 
 	/**

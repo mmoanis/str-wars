@@ -5,9 +5,9 @@
 #include <vector>
 
 // project files
-#include "GameObject.h"
-#include "Player.h"
-#include "Bullet.h"
+#include "gameobject.h"
+#include "player.h"
+#include "bullet.h"
 
 #include <common/shader.hpp>
 using namespace glm;
@@ -34,7 +34,8 @@ private:
     std::vector<Bullet *> bullets;
 
     //graphics managment functions
-    bool setupGL();
+    bool setupGL(const GLfloat g_color_buffer_data[], const GLfloat g_vertex_buffer_data[]);
+
     GLuint programID;
     GLuint MatrixID;
     GLuint vertexPosition_modelspaceID;
@@ -45,11 +46,11 @@ private:
     mat4 View;  //camera matrix
 
     // One color for each vertex.
-    static const GLfloat g_color_buffer_data[];
+    //static const GLfloat g_color_buffer_data[];
 
     // Our vertices. Tree consecutive floats give a 3D vertex; Three consecutive vertices give a triangle.
     // A cube has 6 faces with 2 triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
-    static const GLfloat g_vertex_buffer_data[];
+    //static const GLfloat g_vertex_buffer_data[];
 };
 
 #endif // ENGINE_H

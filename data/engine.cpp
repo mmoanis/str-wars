@@ -2,83 +2,7 @@
 
 #define UPDATES_PER_SECOND 60
 
-static const GLfloat g_color_buffer_data[] = {
-            0.583f,  0.771f,  0.014f,
-            0.583f,  0.771f,  0.014f,
-            0.583f,  0.771f,  0.014f,
-            1.0f,  0.17f,  0.014f,
-            1.0f,  0.17f,  0.014f,
-            1.0f,  0.17f,  0.014f,
-            0.583f,  0.771f,  1.0f,
-            0.583f,  0.771f,  1.0f,
-            0.583f,  0.771f,  1.0f,
-            0.014f, 0.583f,  0.771f,
-            0.014f, 0.583f,  0.771f,
-            0.014f, 0.583f,  0.771f,
-            1.0f,  0.0f,  0.0f,
-            1.0f,  0.0f,  0.0f,
-            1.0f,  0.0f,  0.0f,
-            0.483f,  0.596f,  0.789f,
-            0.559f,  0.861f,  0.639f,
-            0.195f,  0.548f,  0.859f,
-            0.997f,  0.513f,  0.064f,
-            0.945f,  0.719f,  0.592f,
-            0.543f,  0.021f,  0.978f,
-            0.279f,  0.317f,  0.505f,
-            0.167f,  0.620f,  0.077f,
-            0.347f,  0.857f,  0.137f,
-        1.0f,  0.184f,  0.576f,
-        1.0f,  0.184f,  0.576f,
-        1.0f,  0.184f,  0.576f,
-        0.014f,  0.184f,  0.576f,
-        0.014f,  0.184f,  0.576f,
-        0.014f,  0.184f,  0.576f,
-        0.014f,  1.0f,  0.576f,
-        0.014f,  1.0f,  0.576f,
-        0.014f,  1.0f,  0.576f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-        1.0f,  1.0f,  1.0f,
-};
 
-static const GLfloat g_vertex_buffer_data[] = {
-    -1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
-     1.0f, 1.0f,-1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f,-1.0f,
-     1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,
-     1.0f,-1.0f,-1.0f,
-     1.0f, 1.0f,-1.0f,
-     1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f,-1.0f,
-     1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f, 1.0f,
-    -1.0f,-1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-    -1.0f,-1.0f, 1.0f,
-     1.0f,-1.0f, 1.0f,
-     1.0f, 1.0f, 1.0f,
-     1.0f,-1.0f,-1.0f,
-     1.0f, 1.0f,-1.0f,
-     1.0f,-1.0f,-1.0f,
-     1.0f, 1.0f, 1.0f,
-     1.0f,-1.0f, 1.0f,
-     1.0f, 1.0f, 1.0f,
-     1.0f, 1.0f,-1.0f,
-    -1.0f, 1.0f,-1.0f,
-     1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f,-1.0f,
-    -1.0f, 1.0f, 1.0f,
-     1.0f, 1.0f, 1.0f,
-    -1.0f, 1.0f, 1.0f,
-     1.0f,-1.0f, 1.0f
-};
 
 Engine::Engine()
 {
@@ -88,13 +12,6 @@ Engine::Engine()
 Engine::~Engine()
 {
     delete player;
-    // Cleanup VBO and shader
-    glDeleteBuffers(1, &vertexbuffer);
-    glDeleteBuffers(1, &colorbuffer);
-    glDeleteProgram(programID);
-
-    // Close OpenGL window and terminate GLFW
-    glfwTerminate();
 }
 
 /////////////////////////////
@@ -121,7 +38,85 @@ void Engine::render()
 ///run game logic
 void Engine::run()
 {
-    if (setupGL())
+    static const GLfloat g_color_buffer_data[] = {
+                0.583f,  0.771f,  0.014f,
+                0.583f,  0.771f,  0.014f,
+                0.583f,  0.771f,  0.014f,
+                1.0f,  0.17f,  0.014f,
+                1.0f,  0.17f,  0.014f,
+                1.0f,  0.17f,  0.014f,
+                0.583f,  0.771f,  1.0f,
+                0.583f,  0.771f,  1.0f,
+                0.583f,  0.771f,  1.0f,
+                0.014f, 0.583f,  0.771f,
+                0.014f, 0.583f,  0.771f,
+                0.014f, 0.583f,  0.771f,
+                1.0f,  0.0f,  0.0f,
+                1.0f,  0.0f,  0.0f,
+                1.0f,  0.0f,  0.0f,
+                0.483f,  0.596f,  0.789f,
+                0.559f,  0.861f,  0.639f,
+                0.195f,  0.548f,  0.859f,
+                0.997f,  0.513f,  0.064f,
+                0.945f,  0.719f,  0.592f,
+                0.543f,  0.021f,  0.978f,
+                0.279f,  0.317f,  0.505f,
+                0.167f,  0.620f,  0.077f,
+                0.347f,  0.857f,  0.137f,
+            1.0f,  0.184f,  0.576f,
+            1.0f,  0.184f,  0.576f,
+            1.0f,  0.184f,  0.576f,
+            0.014f,  0.184f,  0.576f,
+            0.014f,  0.184f,  0.576f,
+            0.014f,  0.184f,  0.576f,
+            0.014f,  1.0f,  0.576f,
+            0.014f,  1.0f,  0.576f,
+            0.014f,  1.0f,  0.576f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+            1.0f,  1.0f,  1.0f,
+    };
+
+    static const GLfloat g_vertex_buffer_data[] = {
+        -1.0f,-1.0f,-1.0f,
+        -1.0f,-1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f,
+         1.0f, 1.0f,-1.0f,
+        -1.0f,-1.0f,-1.0f,
+        -1.0f, 1.0f,-1.0f,
+         1.0f,-1.0f, 1.0f,
+        -1.0f,-1.0f,-1.0f,
+         1.0f,-1.0f,-1.0f,
+         1.0f, 1.0f,-1.0f,
+         1.0f,-1.0f,-1.0f,
+        -1.0f,-1.0f,-1.0f,
+        -1.0f,-1.0f,-1.0f,
+        -1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f,-1.0f,
+         1.0f,-1.0f, 1.0f,
+        -1.0f,-1.0f, 1.0f,
+        -1.0f,-1.0f,-1.0f,
+        -1.0f, 1.0f, 1.0f,
+        -1.0f,-1.0f, 1.0f,
+         1.0f,-1.0f, 1.0f,
+         1.0f, 1.0f, 1.0f,
+         1.0f,-1.0f,-1.0f,
+         1.0f, 1.0f,-1.0f,
+         1.0f,-1.0f,-1.0f,
+         1.0f, 1.0f, 1.0f,
+         1.0f,-1.0f, 1.0f,
+         1.0f, 1.0f, 1.0f,
+         1.0f, 1.0f,-1.0f,
+        -1.0f, 1.0f,-1.0f,
+         1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f,-1.0f,
+        -1.0f, 1.0f, 1.0f,
+         1.0f, 1.0f, 1.0f,
+        -1.0f, 1.0f, 1.0f,
+         1.0f,-1.0f, 1.0f
+    };
+
+    if (setupGL(g_color_buffer_data, g_vertex_buffer_data))
     {
 
         double lastTime = glfwGetTime(), deltaTime=0.0f;
@@ -144,11 +139,19 @@ void Engine::run()
 
         }
     }
+
+    // Cleanup VBO and shader
+    glDeleteBuffers(1, &vertexbuffer);
+    glDeleteBuffers(1, &colorbuffer);
+    glDeleteProgram(programID);
+
+    // Close OpenGL window and terminate GLFW
+    glfwTerminate();
 }
 /////////////////////////////
 /// \brief Engine::setupGL
 ///set window
-bool Engine::setupGL()
+bool Engine::setupGL(const GLfloat g_color_buffer_data[], const GLfloat g_vertex_buffer_data[])
 {
     // Initialise GLFW
     if( !glfwInit() )
