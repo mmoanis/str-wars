@@ -1,6 +1,6 @@
 # CMake entry point
 cmake_minimum_required (VERSION 2.6)
-project (Graphics_Lab3)
+project (str-wars)
 
 find_package(OpenGL REQUIRED)
 
@@ -68,6 +68,18 @@ add_executable(data
 	common/shader.hpp
     common/controls.cpp
 	common/controls.hpp
+        common/objloader.cpp
+common/objloader.hpp
+common/quaternion_utils.cpp
+common/quaternion_utils.hpp
+common/tangentspace.cpp
+common/tangentspace.hpp
+common/text2D.cpp
+common/text2D.hpp
+common/texture.cpp
+common/texture.hpp
+common/vboindexer.cpp
+common/vboindexer.hpp
 )
 target_link_libraries(data
 	${ALL_LIBS}
