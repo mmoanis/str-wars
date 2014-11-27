@@ -2,13 +2,6 @@
 #define GAMEOBJECT_H
 
 #include "DEFS.h"
-#include <GL/glew.h>
-#include "external/glfw-2.7.6/include/GL/glfw.h"
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/euler_angles.hpp>//rotation
-#include <glm/gtx/norm.hpp>//rotation
 using namespace glm;
 
 class GameObject
@@ -21,7 +14,7 @@ public:
 	/**
 	* especify how the object is drawn to the screen. 
 	**/
-    virtual void render() = 0;
+    virtual void render(RenderData *) = 0;
 	
 	/**
 	* update the object state.
@@ -43,7 +36,7 @@ public:
 
     GameObjectType getObjectType() const;
 
-	vec3 getPosition() const;
+    vec3 getPosition() const;
     void setPosition(vec3);
 
 private:

@@ -10,7 +10,7 @@ public:
     /**
     * especify how the object is drawn to the screen.
     **/
-    virtual void render();
+    virtual void render(RenderData *);
 
     /**
     * update the object state.

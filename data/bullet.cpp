@@ -10,7 +10,7 @@ bool Bullet::checkCollision(GameObject *)
     return false;
 }
 
-void Bullet::render()
+void Bullet::render(RenderData * renderData)
 {
 
 }

@@ -10,7 +10,7 @@
 #include "bullet.h"
 
 #include <common/shader.hpp>
-using namespace glm;
+
 
 //////////////////////////////////////////////
 /// \brief The Engine class
@@ -36,14 +36,7 @@ private:
     //graphics managment functions
     bool setupGL(const GLfloat g_color_buffer_data[], const GLfloat g_vertex_buffer_data[]);
 
-    GLuint programID;
-    GLuint MatrixID;
-    GLuint vertexPosition_modelspaceID;
-    GLuint vertexColorID;
-    GLuint vertexbuffer;
-    GLuint colorbuffer;
-    mat4 Projection;    //prospective matrix
-    mat4 View;  //camera matrix
+    RenderData renderData;
 
     // One color for each vertex.
     //static const GLfloat g_color_buffer_data[];
