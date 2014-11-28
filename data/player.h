@@ -9,14 +9,13 @@ class Player : public GameObject
 {
 public:
     Player(Lane lane, vec3 position);
-    ~Player();
+    virtual ~Player();
 
     //setup and initialize object
     void setup(GLuint programID);
 
     //especify how the object is drawn to the screen.
-    virtual void render(GLuint & programID,GLuint &MatrixID,
-                        mat4 Projection, mat4  View);
+    virtual void render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View);
 
     //update the object state
     virtual void update();

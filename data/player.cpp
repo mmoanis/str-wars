@@ -40,7 +40,7 @@ void Player::setup(GLuint programID)
     glBufferData(GL_ARRAY_BUFFER, _uvs.size() * sizeof(glm::vec2), &_uvs[0], GL_STATIC_DRAW);
 }
 
-void Player::render(GLuint & programID,GLuint &MatrixID, mat4 Projection, mat4  View)
+void Player::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
     //make the matrices for the transformation
     glm::mat4 RotationMatrix = eulerAngleYXZ(0.0f, 0.0f, 0.0f);//yaw, pitch and roll. Measured in radians
@@ -90,46 +90,56 @@ void Player::render(GLuint & programID,GLuint &MatrixID, mat4 Projection, mat4  
     //draw any bullets fired
     for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
     {
-        (*it)->render(programID, MatrixID, Projection, View);
+        (*it)->render(MatrixID, Projection, View);
     }
 }
 
 void Player::update()
 {
-    vec3 position = getPosition();
-
     //get user input
-    if (glfwGetKey( GLFW_KEY_LEFT) ==GLFW_PRESS ) //left arrow is pressed, so move the traingle left
+    if (glfwGetKey( GLFW_KEY_LEFT) == GLFW_PRESS ) //left arrow is pressed, so move the traingle left
     {
-        if (position.x < MAX_POSITIVE_X)
+        if (_position.x < MAX_POSITIVE_X)
         {
-            position.x++;
+            _position.x++;
         }
     }
-    else if (glfwGetKey( GLFW_KEY_RIGHT) ==GLFW_PRESS )
+    else if (glfwGetKey( GLFW_KEY_RIGHT) == GLFW_PRESS )
     {
-        if ( position.x > MAX_NEGATIVE_X )
-            position.x--;
+        if ( _position.x > MAX_NEGATIVE_X )
+            _position.x--;
     }
-    else if (glfwGetKey( GLFW_KEY_UP) ==GLFW_PRESS )
+    else if (glfwGetKey( GLFW_KEY_UP) == GLFW_PRESS )
     {
-        if ( position.z <= MAX_POSITIVE_Z )
-            position.z++;
+        if ( _position.z <= MAX_POSITIVE_Z )
+            _position.z++;
     }
-    else if (glfwGetKey( GLFW_KEY_DOWN) ==GLFW_PRESS )
+    else if (glfwGetKey( GLFW_KEY_DOWN) == GLFW_PRESS )
     {
-        if (position.z >= MAX_NEGATIVE_Z)
-            position.z--;
+        if (_position.z >= MAX_NEGATIVE_Z)
+            _position.z--;
     }
 
-    if (glfwGetKey( GLFW_KEY_DOWN) == GLFW_KEY_SPACE )
+    if (glfwGetKey( GLFW_KEY_SPACE) == GLFW_PRESS )
     {
          //fire bullets
-        //bullets.push_back(new Bullet(getLane(), _position));
+        Bullet * bullet = new Bullet(getLane(), _position);
+        bullets.push_back(bullet);
     }
 
-    //apply changes
-    setPosition(position);
+    //check for dead bullets
+    std::vector < std::vector<Bullet *>::iterator > deletedBullets;
+    for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    {
+        if (!((*it)->isInRange()))
+            deletedBullets.push_back(it);
+    }
+
+    for(std::vector < std::vector<Bullet *>::iterator >::iterator deleteIterator = deletedBullets.begin(); deleteIterator != deletedBullets.end(); deleteIterator++)
+    {
+        //remove dead bullets
+        bullets.erase(*deleteIterator);
+    }
 
     //update bullets
     for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)

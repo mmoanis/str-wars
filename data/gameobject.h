@@ -16,7 +16,7 @@ public:
     virtual void setup(GLuint programID) = 0;
 
     //especify how the object is drawn to the screen
-    virtual void render(GLuint & programID, GLuint &MatrixID, mat4 Projection, mat4  View) = 0;
+    virtual void render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View) = 0;
 	
     //update the object state
 	virtual void update() = 0;

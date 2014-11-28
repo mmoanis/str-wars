@@ -21,7 +21,7 @@ void Engine::render()
     glUseProgram(programID);
 
     //draw player
-    player->render(programID, MatrixID, Projection, View);
+    player->render(MatrixID, Projection, View);
 
     // Swap buffers
     glfwSwapBuffers();
@@ -44,10 +44,10 @@ void Engine::run()
             deltaTime += (glfwGetTime() - lastTime) *  UPDATES_PER_SECOND;
             lastTime = glfwGetTime();
             //get user action and execute it
-            if (deltaTime >= 1.0f)
+            if (deltaTime >= 3.0f)
             {
                 update();
-                deltaTime-= 1.0f;
+                deltaTime-= 3.0f;
             }
 
             //render to screen
