@@ -10,7 +10,8 @@ public:
     /**
     * especify how the object is drawn to the screen.
     **/
-    virtual void render(RenderData *);
+    virtual void render(GLuint & programID,GLuint &MatrixID,
+                        mat4 Projection, mat4  View);
 
     /**
     * update the object state.

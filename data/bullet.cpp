@@ -10,7 +10,8 @@ bool Bullet::checkCollision(GameObject *)
     return false;
 }
 
-void Bullet::render(RenderData * renderData)
+void Bullet::render(GLuint & programID,GLuint &MatrixID,
+                    mat4 Projection, mat4  View)
 {
 
 }

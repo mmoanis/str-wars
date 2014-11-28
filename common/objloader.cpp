@@ -103,7 +103,7 @@ bool loadOBJ(
 		out_uvs     .push_back(uv);
 		out_normals .push_back(normal);
 	
-	}
+    }
 
 	return true;
 }

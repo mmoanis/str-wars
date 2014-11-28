@@ -2,6 +2,7 @@
 #define GAMEOBJECT_H
 
 #include "DEFS.h"
+#include "common/objloader.hpp"
 using namespace glm;
 
 class GameObject
@@ -14,7 +15,8 @@ public:
 	/**
 	* especify how the object is drawn to the screen. 
 	**/
-    virtual void render(RenderData *) = 0;
+    virtual void render(GLuint & programID,GLuint &MatrixID,
+                        mat4 Projection, mat4  View) = 0;
 	
 	/**
 	* update the object state.
@@ -39,7 +41,13 @@ public:
     vec3 getPosition() const;
     void setPosition(vec3);
 
-private:
+    Lane getLane() const;
+    std::vector< glm::vec3 > getVertices() const;
+    std::vector< glm::vec2 > getUVs() const;
+    std::vector< glm::vec3 > getNormals() const;
+
+    ///TODO: make it private
+//private:
     //define the lane which the object in
     Lane _lane;
 
@@ -51,6 +59,15 @@ private:
 
     //position of the object
     vec3 _position;
+
+    ///model parameters
+
+    //vertices
+    std::vector< glm::vec3 > _vertices;
+
+    std::vector< glm::vec2 > _uvs;
+
+    std::vector< glm::vec3 > _normals;
 };
 
 #endif // GAMEOBJECT_H

@@ -9,6 +9,14 @@
 #include <glm/gtx/norm.hpp>//rotation
 using namespace glm;
 
+//global definations
+#define MAX_POSITIVE_X 7
+#define MAX_POSITIVE_Y 7
+#define MAX_POSITIVE_Z 7
+#define MAX_NEGATIVE_X -7
+#define MAX_NEGATIVE_Y -7
+#define MAX_NEGATIVE_Z -7
+
 enum Lane {
     LEFT,
     CENTER,
@@ -20,36 +28,6 @@ enum GameObjectType {
     MONSTER,
     OBSTECL,
     BULLET
-};
-
-///
-/// \brief The RenderData struct
-///stores information for drawing
-struct RenderData {
-    GLuint programID;
-    GLuint MatrixID;
-    GLuint vertexPosition_modelspaceID;
-    GLuint vertexColorID;
-    GLuint vertexbuffer;
-    GLuint colorbuffer;
-    mat4 Projection;//prospective matrix
-    mat4  View;//camera matrix
-};
-
-struct Coordinate {
-    float x, y, z;
-    Coordinate();
-    Coordinate(float x, float y, float z)
-    {
-        this->x = x;
-        this->y = y;
-        this->z = z;
-    }
-
-    vec3 to_vec()
-    {
-        return vec3(x, y, z);
-    }
 };
 
 #endif // DEFS_H
