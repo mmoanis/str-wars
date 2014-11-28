@@ -17,20 +17,24 @@ public:
     //constructor and destructor
     Engine();
     ~Engine();
+
+    //run game logic
     void run();
 
 private:
-    //game managment functions
+    ///game managment functions
+
+    //render objects to screen
     void render();
+
+    //update gameobjects status
     void update();
 
     //gameobjects
     Player * player;
 
-    //graphics managment functions
+    //setup gl and open window
     bool setupGL();
-
-    //RenderData renderData;
 
     GLuint programID;
     GLuint MatrixID;

@@ -7,20 +7,13 @@ class Bullet : public GameObject
 public:
     Bullet(Lane lane, vec3 position);
 
-    /**
-    * especify how the object is drawn to the screen.
-    **/
-    virtual void render(GLuint & programID,GLuint &MatrixID,
-                        mat4 Projection, mat4  View);
+    //especify how the object is drawn to the screen
+    virtual void render(GLuint & programID,GLuint &MatrixID, mat4 Projection, mat4  View);
 
-    /**
-    * update the object state.
-    **/
+    //update the object state
     virtual void update();
 
-    /**
-    * Checks collision with another GameObject.
-    **/
+    //Checks collision with another GameObject
     virtual bool checkCollision(GameObject *);
 };
 

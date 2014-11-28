@@ -1,7 +1,5 @@
 #include "engine.h"
 
-#define UPDATES_PER_SECOND 60
-
 Engine::Engine()
 {
     this->player = new Player(CENTER, vec3(0, 0, 0));
@@ -12,9 +10,7 @@ Engine::~Engine()
     delete player;
 }
 
-/////////////////////////////
-/// \brief Engine::render
-///render game objects
+//render objects to screen
 void Engine::render()
 {
 
@@ -29,15 +25,16 @@ void Engine::render()
 
     // Swap buffers
     glfwSwapBuffers();
-    glfwPollEvents();
 }
-/////////////////////////////
-/// \brief Engine::run
-///run game logic
+
+//run game logic
 void Engine::run()
 {
     if (setupGL())
     {
+        //initialize gameobjects
+        player->setup(programID);
+
         double lastTime = glfwGetTime(), deltaTime=0.0f;
         while (glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS &&
                glfwGetWindowParam( GLFW_OPENED ))
@@ -64,9 +61,8 @@ void Engine::run()
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
 }
-/////////////////////////////
-/// \brief Engine::setupGL
-///set window
+
+//setup gl and open window
 bool Engine::setupGL()
 {
     // Initialise GLFW
@@ -108,7 +104,7 @@ bool Engine::setupGL()
 
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader" );
-    printf("pid %d", (int)programID);
+
     // Get a handle for our "MVP" uniform
     // Model matrix gives the coordinates and transformation of objects in global coordinates
     // returns an integer that represents the location of a specific uniform variable
@@ -127,6 +123,7 @@ bool Engine::setupGL()
     return true;
 }
 
+//update gameobjects status
 void Engine::update()
 {
     //update player status

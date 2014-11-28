@@ -6,6 +6,7 @@ GameObject::GameObject(Lane lane, vec3 position, GameObjectType type)
     this->_objectType = type;
     this->_position = position;
 }
+
 GameObject::GameObject()
 {
 
@@ -14,11 +15,6 @@ GameObject::GameObject()
 GameObject::~GameObject()
 {
 
-}
-
-Lane GameObject::getObjectLane() const
-{
-    return _lane;
 }
 
 GameObjectType GameObject::getObjectType() const

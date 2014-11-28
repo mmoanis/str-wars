@@ -10,25 +10,29 @@ class Player : public GameObject
 public:
     Player(Lane lane, vec3 position);
     ~Player();
-    /**
-    * especify how the object is drawn to the screen.
-    **/
+
+    //setup and initialize object
+    void setup(GLuint programID);
+
+    //especify how the object is drawn to the screen.
     virtual void render(GLuint & programID,GLuint &MatrixID,
                         mat4 Projection, mat4  View);
 
-    /**
-    * update the object state.
-    **/
+    //update the object state
     virtual void update();
 
-    /**
-    * Checks collision with another GameObject.
-    **/
+    //Checks collision with another GameObject
     virtual bool checkCollision(GameObject *);
 
+    //vertex position handle
     GLuint vertexPosition_modelspaceID;
+
+    //UV handle
     GLuint vertexUVID;
+
+    //
     GLuint uvbuffer;
+
     GLuint vertexbuffer;
 private:
     std::vector<Bullet *> bullets;

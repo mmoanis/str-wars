@@ -12,42 +12,42 @@ public:
     GameObject();
     virtual ~GameObject();
 
-	/**
-	* especify how the object is drawn to the screen. 
-	**/
-    virtual void render(GLuint & programID,GLuint &MatrixID,
-                        mat4 Projection, mat4  View) = 0;
+    //setup and initialize object
+    virtual void setup(GLuint programID) = 0;
+
+    //especify how the object is drawn to the screen
+    virtual void render(GLuint & programID, GLuint &MatrixID, mat4 Projection, mat4  View) = 0;
 	
-	/**
-	* update the object state.
-	**/
+    //update the object state
 	virtual void update() = 0;
 
-	/**
-	* Checks collision with another GameObject.
-	**/
+    //Checks collision with another GameObject
     virtual bool checkCollision(GameObject *) = 0;
 
     //virtual void makeSoundEffect() = 0;
 
-    /**
-     * @brief getObjectLane
-     * @return
-     */
-    Lane getObjectLane() const;
-
+    //gets the type of the object
     GameObjectType getObjectType() const;
 
+    //get the position of the object
     vec3 getPosition() const;
+
+    //set the position of the object
     void setPosition(vec3);
 
+    //get the lane the object currently occupies
     Lane getLane() const;
+
+    //get the vertices of the object
     std::vector< glm::vec3 > getVertices() const;
+
+    //get the UVs of the object
     std::vector< glm::vec2 > getUVs() const;
+
+    //get the normals of the object
     std::vector< glm::vec3 > getNormals() const;
 
-    ///TODO: make it private
-//private:
+protected:
     //define the lane which the object in
     Lane _lane;
 

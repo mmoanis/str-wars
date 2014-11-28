@@ -16,6 +16,7 @@ using namespace glm;
 #define MAX_NEGATIVE_X -7
 #define MAX_NEGATIVE_Y -7
 #define MAX_NEGATIVE_Z -7
+#define UPDATES_PER_SECOND 60
 
 enum Lane {
     LEFT,
