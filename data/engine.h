@@ -33,17 +33,25 @@ private:
     //gameobjects
     Player * player;
 
+    std::vector<Bullet> bullets;
+
     //setup gl and open window
     bool setupGL();
 
+    //program id
     GLuint programID;
+
+    //mvp matrix id
     GLuint MatrixID;
+
     GLuint vertexPosition_modelspaceID;
     GLuint vertexColorID;
-    GLuint vertexbuffer;
-    GLuint colorbuffer;
-    mat4 Projection;//prospective matrix
-    mat4  View;//camera matrix
+
+    //prospective matrix
+    mat4 Projection;
+
+    //camera matrix
+    mat4  View;
 };
 
 #endif // ENGINE_H

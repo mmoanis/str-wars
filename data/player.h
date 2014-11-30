@@ -23,18 +23,7 @@ public:
     //Checks collision with another GameObject
     virtual bool checkCollision(GameObject *);
 
-    //vertex position handle
-    GLuint vertexPosition_modelspaceID;
-
-    //UV handle
-    GLuint vertexUVID;
-
-    //
-    GLuint uvbuffer;
-
-    GLuint vertexbuffer;
 private:
-    std::vector<Bullet *> bullets;
 };
 
 #endif // PLAYER_H

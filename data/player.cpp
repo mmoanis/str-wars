@@ -10,6 +10,7 @@ Player::Player(Lane lane, vec3 position): GameObject(lane, position, PLAYER)
     printf("Player::Player() at x=%d y=%d z=%d\n", (int)position.x, (int)position.y, (int)position.z);
     // Read our .obj file
     loadOBJ("models/Wraith Raider Starship/WraithRaiderStarship.obj", _vertices, _uvs, _normals);
+
 }
 
 Player::~Player()
@@ -17,12 +18,7 @@ Player::~Player()
     //delete the handles
     glDeleteBuffers(1, &vertexbuffer);
     glDeleteBuffers(1, &uvbuffer);
-
-    //delete remaining bullets
-    for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
-    {
-        delete (*it);
-    }
+    glDeleteTextures(1, &textureID);
 }
 
 void Player::setup(GLuint programID)
@@ -31,6 +27,10 @@ void Player::setup(GLuint programID)
     //GLuint vertexColorID = glGetAttribLocation(programID, "vertexColor");
     vertexUVID = glGetAttribLocation(programID, "vertexUV");
 
+    texture = loadBMP_custom("models/Wraith Raider Starship/wr2.bmp");
+    // Get a handle for our "myTextureSampler" uniform
+    textureID  = glGetUniformLocation(programID, "myTextureSampler");
+
     glGenBuffers(1, &vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(glm::vec3), &_vertices[0], GL_STATIC_DRAW);
@@ -38,14 +38,16 @@ void Player::setup(GLuint programID)
     glGenBuffers(1, &uvbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
     glBufferData(GL_ARRAY_BUFFER, _uvs.size() * sizeof(glm::vec2), &_uvs[0], GL_STATIC_DRAW);
+
+    RotationMatrix = eulerAngleYXZ(0.0f, 0.0f, 0.0f);//yaw, pitch and roll. Measured in radians
+    ScalingMatrix = scale(mat4(), vec3(0.005f, 0.005f, 0.005f));
 }
 
 void Player::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
     //make the matrices for the transformation
-    glm::mat4 RotationMatrix = eulerAngleYXZ(0.0f, 0.0f, 0.0f);//yaw, pitch and roll. Measured in radians
-    glm::mat4 TranslationMatrix = translate(mat4(), vec3((int)_position.x, 0.0f,(int)_position.z));
-    glm::mat4 ScalingMatrix = scale(mat4(), vec3(0.005f, 0.005f, 0.005f));
+    TranslationMatrix = translate(mat4(), vec3((int)_position.x, 0.0f,(int)_position.z));
+
     glm::mat4 Model = TranslationMatrix* RotationMatrix* ScalingMatrix;//order of multiplication is important (try different values above and different order of multiplication)
 
     //make the MVP matix
@@ -55,6 +57,12 @@ void Player::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &
     // in the "MVP" uniform
     // For each object you render, since the MVP will be different (at least the Model part)
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+
+    // Bind our texture in Texture Unit 0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // Set our "myTextureSampler" sampler to user Texture Unit 0
+    glUniform1i(textureID, 0);
 
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(vertexPosition_modelspaceID);
@@ -85,13 +93,6 @@ void Player::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &
 
     glDisableVertexAttribArray(vertexPosition_modelspaceID);
     glDisableVertexAttribArray(vertexUVID);
-
-    //render player bullets
-    //draw any bullets fired
-    for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
-    {
-        (*it)->render(MatrixID, Projection, View);
-    }
 }
 
 void Player::update()
@@ -118,32 +119,5 @@ void Player::update()
     {
         if (_position.z >= MAX_NEGATIVE_Z)
             _position.z--;
-    }
-
-    if (glfwGetKey( GLFW_KEY_SPACE) == GLFW_PRESS )
-    {
-         //fire bullets
-        Bullet * bullet = new Bullet(getLane(), _position);
-        bullets.push_back(bullet);
-    }
-
-    //check for dead bullets
-    std::vector < std::vector<Bullet *>::iterator > deletedBullets;
-    for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
-    {
-        if (!((*it)->isInRange()))
-            deletedBullets.push_back(it);
-    }
-
-    for(std::vector < std::vector<Bullet *>::iterator >::iterator deleteIterator = deletedBullets.begin(); deleteIterator != deletedBullets.end(); deleteIterator++)
-    {
-        //remove dead bullets
-        bullets.erase(*deleteIterator);
-    }
-
-    //update bullets
-    for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
-    {
-        (*it)->update();
     }
 }

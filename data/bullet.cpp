@@ -115,14 +115,18 @@ void Bullet::setup(GLuint programID)
     glGenBuffers(1, &colorbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+
+    RotationMatrix = eulerAngleYXZ(0.0f, 0.0f,3.0f);
+    ScalingMatrix = scale(mat4(), vec3(0.15f, 0.15f, 0.15f));
 }
 
 void Bullet::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
+    ///debug
+    //printf("Bullet::render()\n");
+
     //make transformation matrices
-    glm::mat4 RotationMatrix = eulerAngleYXZ(0.0f, 0.0f,3.0f);
-    glm::mat4 TranslationMatrix = translate(mat4(), _position);
-    glm::mat4 ScalingMatrix = scale(mat4(), vec3(0.005f, 0.005f, 0.005f));
+    TranslationMatrix = translate(mat4(), _position);
     glm::mat4 Model = TranslationMatrix * RotationMatrix * ScalingMatrix;
 
     //make the MVP matrix

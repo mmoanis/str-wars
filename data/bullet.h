@@ -25,13 +25,6 @@ public:
 private:
     //bullet is still alive
     bool inRange;
-
-    GLuint vertexPosition_modelspaceID;
-
-    GLuint vertexColorID;
-
-    GLuint colorbuffer;
-    GLuint vertexbuffer;
 };
 
 #endif // BULLET_H

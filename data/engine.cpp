@@ -8,6 +8,12 @@ Engine::Engine()
 Engine::~Engine()
 {
     delete player;
+
+    /*//delete remaining bullets
+    for(std::vector<Bullet>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    {
+        delete (*it);
+    }*/
 }
 
 //render objects to screen
@@ -22,6 +28,13 @@ void Engine::render()
 
     //draw player
     player->render(MatrixID, Projection, View);
+
+    //render player bullets
+    //draw any bullets fired
+    for(std::vector<Bullet>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    {
+        (*it).render(MatrixID, Projection, View);
+    }
 
     // Swap buffers
     glfwSwapBuffers();
@@ -128,4 +141,35 @@ void Engine::update()
 {
     //update player status
     player->update();
+
+    if (glfwGetKey( GLFW_KEY_SPACE) == GLFW_PRESS )
+    {
+         //fire bullets
+        //Bullet * bullet = new Bullet(player->getLane(), player->getPosition());
+        Bullet bullet(player->getLane(), player->getPosition());
+        bullet.setup(programID);
+        bullets.push_back(bullet);
+    }
+
+    //check for dead bullets
+    std::vector < std::vector<Bullet>::iterator > deletedBullets;
+    for(std::vector<Bullet>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    {
+        if (!((*it).isInRange()))
+            deletedBullets.push_back(it);
+    }
+
+    for(std::vector < std::vector<Bullet>::iterator >::iterator deleteIterator = deletedBullets.begin(); deleteIterator != deletedBullets.end(); deleteIterator++)
+    {
+        //remove dead bullets
+        bullets.erase(*deleteIterator);
+    }
+
+    //update bullets
+    for(std::vector<Bullet>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    {
+        (*it).update();
+    }
+
+    printf("Engine::update() number of bullets alive:%d\n", bullets.size());
 }

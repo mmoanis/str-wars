@@ -3,6 +3,8 @@
 
 #include "DEFS.h"
 #include "common/objloader.hpp"
+#include "common/texture.hpp"
+
 using namespace glm;
 
 class GameObject
@@ -68,6 +70,35 @@ protected:
     std::vector< glm::vec2 > _uvs;
 
     std::vector< glm::vec3 > _normals;
+
+    //vertex position handle
+    GLuint vertexPosition_modelspaceID;
+
+    //UV handle
+    GLuint vertexUVID;
+
+    //uv buffer
+    GLuint uvbuffer;
+
+    //texture handle
+    GLuint texture;
+
+    //texture
+    GLuint textureID;
+
+    GLuint vertexbuffer;
+
+    GLuint vertexColorID;
+
+    GLuint colorbuffer;
+
+
+    ///transformation matrices
+    glm::mat4 RotationMatrix;
+
+    glm::mat4 TranslationMatrix;
+
+    glm::mat4 ScalingMatrix;
 };
 
 #endif // GAMEOBJECT_H
