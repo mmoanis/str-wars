@@ -2,8 +2,6 @@
 #define PLAYER_H
 
 #include "gameobject.h"
-#include "vector"
-#include "bullet.h"
 
 class Player : public GameObject
 {
@@ -11,19 +9,28 @@ public:
     Player(Lane lane, vec3 position);
     virtual ~Player();
 
-    //setup and initialize object
-    void setup(GLuint programID);
+    // Setup and initialize object
+    void setup();
 
-    //especify how the object is drawn to the screen.
+    // Especify how the object is drawn to the screen.
     virtual void render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View);
 
-    //update the object state
-    virtual void update();
+    // Update the object state
+    virtual void update(GLFWwindow* window);
 
-    //Checks collision with another GameObject
+    // Release handlers
+    virtual void releaseResources();
+
+    // Release handlers
+    virtual void releaseTexture();
+
+    // Checks collision with another GameObject
     virtual bool checkCollision(GameObject *);
 
 private:
+
+    // Player health
+    int _health;
 };
 
 #endif // PLAYER_H

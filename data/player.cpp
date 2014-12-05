@@ -1,48 +1,49 @@
 #include "player.h"
 
-bool Player::checkCollision(GameObject *)
-{
-    return false;
-}
-
+// Constructor
 Player::Player(Lane lane, vec3 position): GameObject(lane, position, PLAYER)
 {
     printf("Player::Player() at x=%d y=%d z=%d\n", (int)position.x, (int)position.y, (int)position.z);
-    // Read our .obj file
-    loadOBJ("models/Wraith Raider Starship/WraithRaiderStarship.obj", _vertices, _uvs, _normals);
-
+    RotationMatrix = eulerAngleYXZ(0.0f, 0.0f, 0.0f);//yaw, pitch and roll. Measured in radians
+    ScalingMatrix = scale(mat4(), vec3(0.08f, 0.08f, 0.08f));
+    _health = 100;
 }
 
+// Destructor
 Player::~Player()
+{
+    printf("Player::~Player() destructed");
+}
+
+// Check collision with other objects
+bool Player::checkCollision(GameObject *)
+{
+    // TODO: implement collision detection
+    return false;
+}
+
+// Release handlers IDs
+void Player::releaseResources()
 {
     //delete the handles
     glDeleteBuffers(1, &vertexbuffer);
     glDeleteBuffers(1, &uvbuffer);
+}
+
+// Release the textures
+void Player::releaseTexture()
+{
+    //delete the handles
     glDeleteTextures(1, &textureID);
 }
 
-void Player::setup(GLuint programID)
+// Initialize object state
+// @Deprecated: use constructor instead
+void Player::setup()
 {
-    vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
-    //GLuint vertexColorID = glGetAttribLocation(programID, "vertexColor");
-    vertexUVID = glGetAttribLocation(programID, "vertexUV");
-
-    texture = loadBMP_custom("models/Wraith Raider Starship/wr2.bmp");
-    // Get a handle for our "myTextureSampler" uniform
-    textureID  = glGetUniformLocation(programID, "myTextureSampler");
-
-    glGenBuffers(1, &vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, _vertices.size() * sizeof(glm::vec3), &_vertices[0], GL_STATIC_DRAW);
-
-    glGenBuffers(1, &uvbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-    glBufferData(GL_ARRAY_BUFFER, _uvs.size() * sizeof(glm::vec2), &_uvs[0], GL_STATIC_DRAW);
-
-    RotationMatrix = eulerAngleYXZ(0.0f, 0.0f, 0.0f);//yaw, pitch and roll. Measured in radians
-    ScalingMatrix = scale(mat4(), vec3(0.005f, 0.005f, 0.005f));
 }
 
+// Draws the player on the screen
 void Player::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
     //make the matrices for the transformation
@@ -95,27 +96,28 @@ void Player::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &
     glDisableVertexAttribArray(vertexUVID);
 }
 
-void Player::update()
+// Update the player states
+void Player::update(GLFWwindow* window)
 {
     //get user input
-    if (glfwGetKey( GLFW_KEY_LEFT) == GLFW_PRESS ) //left arrow is pressed, so move the traingle left
+    if (glfwGetKey( window, GLFW_KEY_LEFT) == GLFW_PRESS ) //left arrow is pressed, so move the traingle left
     {
         if (_position.x < MAX_POSITIVE_X)
         {
             _position.x++;
         }
     }
-    else if (glfwGetKey( GLFW_KEY_RIGHT) == GLFW_PRESS )
+    else if (glfwGetKey( window, GLFW_KEY_RIGHT) == GLFW_PRESS )
     {
         if ( _position.x > MAX_NEGATIVE_X )
             _position.x--;
     }
-    else if (glfwGetKey( GLFW_KEY_UP) == GLFW_PRESS )
+    else if (glfwGetKey( window, GLFW_KEY_UP) == GLFW_PRESS )
     {
         if ( _position.z <= MAX_POSITIVE_Z )
             _position.z++;
     }
-    else if (glfwGetKey( GLFW_KEY_DOWN) == GLFW_PRESS )
+    else if (glfwGetKey( window, GLFW_KEY_DOWN) == GLFW_PRESS )
     {
         if (_position.z >= MAX_NEGATIVE_Z)
             _position.z--;

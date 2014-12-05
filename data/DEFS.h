@@ -1,7 +1,7 @@
 #ifndef DEFS_H
 #define DEFS_H
 #include <GL/glew.h>
-#include "GL/glfw.h"
+#include "glfw3.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -15,7 +15,7 @@ using namespace glm;
 #define MAX_POSITIVE_Z 7
 #define MAX_NEGATIVE_X -7
 #define MAX_NEGATIVE_Y -7
-#define MAX_NEGATIVE_Z -7
+#define MAX_NEGATIVE_Z -5
 #define UPDATES_PER_SECOND 60
 
 enum Lane {

@@ -12,10 +12,13 @@ public:
     virtual void render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View);
 
     //setup and initialize bullet object
-    virtual void setup(GLuint programID);
+    virtual void setup();
 
     //update the object state
-    virtual void update();
+    virtual void update(GLFWwindow* window);
+
+    //release handlers
+    virtual void releaseResources();
 
     //Checks collision with another GameObject
     virtual bool checkCollision(GameObject *);
@@ -25,6 +28,12 @@ public:
 private:
     //bullet is still alive
     bool inRange;
+
+    // Bullet rotation angle
+    float angle;
+
+    // Number of bullet objects created
+    static int bulletCount;
 };
 
 #endif // BULLET_H

@@ -3,17 +3,18 @@
 Engine::Engine()
 {
     this->player = new Player(CENTER, vec3(0, 0, 0));
+    updateSensitivity = 0;
 }
 
 Engine::~Engine()
 {
     delete player;
 
-    /*//delete remaining bullets
-    for(std::vector<Bullet>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    //delete remaining bullets
+    for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
     {
         delete (*it);
-    }*/
+    }
 }
 
 //render objects to screen
@@ -31,13 +32,13 @@ void Engine::render()
 
     //render player bullets
     //draw any bullets fired
-    for(std::vector<Bullet>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
     {
-        (*it).render(MatrixID, Projection, View);
+        (*it)->render(MatrixID, Projection, View);
     }
 
     // Swap buffers
-    glfwSwapBuffers();
+    glfwSwapBuffers(window);
 }
 
 //run game logic
@@ -49,9 +50,9 @@ void Engine::run()
         player->setup(programID);
 
         double lastTime = glfwGetTime(), deltaTime=0.0f;
-        while (glfwGetKey( GLFW_KEY_ESC ) != GLFW_PRESS &&
-               glfwGetWindowParam( GLFW_OPENED ))
-            //gameloop
+
+        //gameloop
+        do
         {
 
             deltaTime += (glfwGetTime() - lastTime) *  UPDATES_PER_SECOND;
@@ -66,6 +67,9 @@ void Engine::run()
             //render to screen
             render();
         }
+        // Check if the ESC key was pressed or the window was closed
+        while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+               glfwWindowShouldClose(window) == 0 );
     }
 
     // Cleanup VBO and shader
@@ -85,17 +89,14 @@ bool Engine::setupGL()
         return false;
     }
 
-    glfwOpenWindowHint(GLFW_FSAA_SAMPLES, 4);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MAJOR, 2);
-    glfwOpenWindowHint(GLFW_OPENGL_VERSION_MINOR, 1);
-
     // Open a window and create its OpenGL context
-    if( !glfwOpenWindow( 1024, 768, 0,0,0,0, 32,0, GLFW_WINDOW ) )
-    {
+    window = glfwCreateWindow( 1024, 768, "Tutorial 07 - Model Loading", NULL, NULL);
+    if( window == NULL ){
         fprintf( stderr, "Failed to open GLFW window.\n" );
-        //glfwTerminate();
+        glfwTerminate();
         return false;
     }
+    glfwMakeContextCurrent(window);
 
     // Initialize GLEW
     if (glewInit() != GLEW_OK) {
@@ -103,10 +104,12 @@ bool Engine::setupGL()
         return false;
     }
 
-    glfwSetWindowTitle( "str-wars" );
+    glfwSetWindowTitle(window, "str-wars" );
 
     // Ensure we can capture the escape key being pressed below
-    glfwEnable( GLFW_STICKY_KEYS );
+    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+    //glfwSetCursorPos(window, 1024/2, 768/2);
+
     // Dark blue background
     glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
 
@@ -114,6 +117,9 @@ bool Engine::setupGL()
     glEnable(GL_DEPTH_TEST);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
+
+    // Cull triangles which normal is not towards the camera
+    glEnable(GL_CULL_FACE);
 
     // Create and compile our GLSL program from the shaders
     programID = LoadShaders( "TransformVertexShader.vertexshader", "ColorFragmentShader.fragmentshader" );
@@ -140,35 +146,40 @@ bool Engine::setupGL()
 void Engine::update()
 {
     //update player status
-    player->update();
+    player->update(window);
 
-    if (glfwGetKey( GLFW_KEY_SPACE) == GLFW_PRESS )
+    updateSensitivity++;
+
+
+    if (updateSensitivity > 10)
     {
-         //fire bullets
-        //Bullet * bullet = new Bullet(player->getLane(), player->getPosition());
-        Bullet bullet(player->getLane(), player->getPosition());
-        bullet.setup(programID);
-        bullets.push_back(bullet);
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS )
+        {
+             //fire bullets
+            Bullet * bullet = new Bullet(player->getLane(), player->getPosition());
+            bullet->setup(programID);
+            bullets.push_back(bullet);
+        }
+        updateSensitivity -= 10;
     }
-
     //check for dead bullets
-    std::vector < std::vector<Bullet>::iterator > deletedBullets;
-    for(std::vector<Bullet>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    std::vector < std::vector<Bullet *>::iterator > deletedBullets;
+    for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
     {
-        if (!((*it).isInRange()))
+        if (!((*it)->isInRange()))
             deletedBullets.push_back(it);
     }
 
-    for(std::vector < std::vector<Bullet>::iterator >::iterator deleteIterator = deletedBullets.begin(); deleteIterator != deletedBullets.end(); deleteIterator++)
+    for(std::vector < std::vector<Bullet *>::iterator >::iterator deleteIterator = deletedBullets.begin(); deleteIterator != deletedBullets.end(); deleteIterator++)
     {
         //remove dead bullets
         bullets.erase(*deleteIterator);
     }
 
     //update bullets
-    for(std::vector<Bullet>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
     {
-        (*it).update();
+        (*it)->update(window);
     }
 
     printf("Engine::update() number of bullets alive:%d\n", bullets.size());

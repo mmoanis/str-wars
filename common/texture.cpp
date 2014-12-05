@@ -4,7 +4,7 @@
 
 #include <GL/glew.h>
 
-#include <GL/glfw.h>
+#include <glfw3.h>
 
 
 GLuint loadBMP_custom(const char * imagepath){
@@ -21,7 +21,7 @@ GLuint loadBMP_custom(const char * imagepath){
 
 	// Open the file
 	FILE * file = fopen(imagepath,"rb");
-	if (!file)							    {printf("%s could not be opened. Are you in the right directory ? Don't forget to read the FAQ !\n", imagepath); return 0;}
+	if (!file)							    {printf("%s could not be opened. Are you in the right directory ? Don't forget to read the FAQ !\n", imagepath); getchar(); return 0;}
 
 	// Read the header, i.e. the 54 first bytes
 
@@ -86,28 +86,30 @@ GLuint loadBMP_custom(const char * imagepath){
 	return textureID;
 }
 
-GLuint loadTGA_glfw(const char * imagepath){
+// Since GLFW 3, glfwLoadTexture2D() has been removed. You have to use another texture loading library, 
+// or do it yourself (just like loadBMP_custom and loadDDS)
+/*GLuint loadTGA_glfw(const char * imagepath){
 
-	// Create one OpenGL texture
-	GLuint textureID;
-	glGenTextures(1, &textureID);
+    // Create one OpenGL texture
+    GLuint textureID;
+    glGenTextures(1, &textureID);
 
-	// "Bind" the newly created texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, textureID);
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, textureID);
 
-	// Read the file, call glTexImage2D with the right parameters
-	glfwLoadTexture2D(imagepath, 0);
+    // Read the file, call glTexImage2D with the right parameters
+    glfwLoadTexture2D(imagepath, 0);
 
-	// Nice trilinear filtering.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR); 
-	glGenerateMipmap(GL_TEXTURE_2D);
+    // Nice trilinear filtering.
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
-	// Return the ID of the texture we just created
-	return textureID;
-}
+    // Return the ID of the texture we just created
+    return textureID;
+}*/
 
 
 
@@ -123,8 +125,10 @@ GLuint loadDDS(const char * imagepath){
  
 	/* try to open the file */ 
 	fp = fopen(imagepath, "rb"); 
-	if (fp == NULL) 
-		return 0; 
+	if (fp == NULL){
+		printf("%s could not be opened. Are you in the right directory ? Don't forget to read the FAQ !\n", imagepath); getchar(); 
+		return 0;
+	}
    
 	/* verify the type of file */ 
 	char filecode[4]; 
@@ -192,6 +196,11 @@ GLuint loadDDS(const char * imagepath){
 		offset += size; 
 		width  /= 2; 
 		height /= 2; 
+
+		// Deal with Non-Power-Of-Two textures. This code is not included in the webpage to reduce clutter.
+		if(width < 1) width = 1;
+		if(height < 1) height = 1;
+
 	} 
 
 	free(buffer); 

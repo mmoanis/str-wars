@@ -1,8 +1,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
-// headers
+
 #include <stdio.h>
-#include <vector>
 
 // project files
 #include "gameobject.h"
@@ -33,7 +32,7 @@ private:
     //gameobjects
     Player * player;
 
-    std::vector<Bullet> bullets;
+    std::vector<Bullet *> bullets;
 
     //setup gl and open window
     bool setupGL();
@@ -52,6 +51,9 @@ private:
 
     //camera matrix
     mat4  View;
+
+    //decrease update rate of certain objects
+    int updateSensitivity;
 };
 
 #endif // ENGINE_H
