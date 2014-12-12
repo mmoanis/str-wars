@@ -4,15 +4,19 @@
 Player::Player(Lane lane, vec3 position): GameObject(lane, position, PLAYER)
 {
     printf("Player::Player() at x=%d y=%d z=%d\n", (int)position.x, (int)position.y, (int)position.z);
-    RotationMatrix = eulerAngleYXZ(0.0f, 0.0f, 0.0f);//yaw, pitch and roll. Measured in radians
-    ScalingMatrix = scale(mat4(), vec3(0.08f, 0.08f, 0.08f));
+    RotationMatrix = eulerAngleYXZ(0.0f, 0.5f, 0.0f);//yaw, pitch and roll. Measured in radians
+    //ScalingMatrix = scale(mat4(), vec3(0.05f, 0.05f, 0.05f));
+    ScalingMatrix = scale(mat4(), vec3(0.005f, 0.005f, 0.005f));
     _health = 100;
+    anglex = 0.0;
+    anglez = 0;
+    angley = 3.14;
 }
 
 // Destructor
 Player::~Player()
 {
-    printf("Player::~Player() destructed");
+    printf("Player::~Player() destructed\n");
 }
 
 // Check collision with other objects
@@ -47,7 +51,7 @@ void Player::setup()
 void Player::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
     //make the matrices for the transformation
-    TranslationMatrix = translate(mat4(), vec3((int)_position.x, 0.0f,(int)_position.z));
+    TranslationMatrix = translate(mat4(), vec3((int)_position.x, (int)_position.y,(int)_position.z));
 
     glm::mat4 Model = TranslationMatrix* RotationMatrix* ScalingMatrix;//order of multiplication is important (try different values above and different order of multiplication)
 
@@ -105,21 +109,48 @@ void Player::update(GLFWwindow* window)
         if (_position.x < MAX_POSITIVE_X)
         {
             _position.x++;
+            anglez += 0.1;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_RIGHT) == GLFW_PRESS )
     {
         if ( _position.x > MAX_NEGATIVE_X )
+        {
             _position.x--;
+            anglez -= 0.1;
+        }
+    }
+    else if (glfwGetKey( window, GLFW_KEY_W) == GLFW_PRESS )
+    {
+        if ( _position.z <= MAX_POSITIVE_Z )
+        {
+            _position.z++;
+            if (anglex < 0.5)
+                anglex += 0.05;
+        }
+    }
+    else if (glfwGetKey( window, GLFW_KEY_S) == GLFW_PRESS )
+    {
+        if (_position.z >= MAX_NEGATIVE_Z)
+        {
+            _position.z--;
+            if ( anglex > 0)
+                anglex -= 0.1;
+        }
     }
     else if (glfwGetKey( window, GLFW_KEY_UP) == GLFW_PRESS )
     {
-        if ( _position.z <= MAX_POSITIVE_Z )
-            _position.z++;
+        if ( _position.y <= MAX_POSITIVE_Y )
+        {
+            _position.y++;
+        }
     }
     else if (glfwGetKey( window, GLFW_KEY_DOWN) == GLFW_PRESS )
     {
-        if (_position.z >= MAX_NEGATIVE_Z)
-            _position.z--;
+        if (_position.y >= MAX_NEGATIVE_Y)
+        {
+            _position.y--;
+        }
     }
+    RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
 }

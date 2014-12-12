@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <math.h>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -22,7 +23,9 @@ using namespace glm;
 
 #include "player.h"
 #include "bullet.h"
-
+#include "scene.h"
+#include "monster.h"
+#include "obstecle.h"
 
 ///
 /// Holds the main context of the game
@@ -57,6 +60,8 @@ int main( void )
         return -1;
     }
 
+    printf("main::main():61 glfw context created\n");
+
     /// Window properties
 
     // Ensure we can capture the escape key being pressed below
@@ -87,15 +92,39 @@ int main( void )
     glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
     // Camera matrix
     glm::mat4 View       = glm::lookAt(
-                 glm::vec3(0,10,-10), //position
+                 glm::vec3(0,2,-10), //position
                  glm::vec3(0,0,0), // and looks at the origin
                  glm::vec3(0,1,0)  // Head is up
                  );
 
+    printf("main::main() finished initialization\n");
+
     /// ----------------------------------------* GameObjects *------------------------------------------
 
     // /////////////////////////////////////////////////////////////////////////////////////////////////
+    // The Scene
+    printf("main::main(): making scene\n");
+
+    Scene * scene = new Scene();
+    GLuint vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
+    GLuint vertexUVID = glGetAttribLocation(programID, "vertexUV");
+   // Load the texture
+    GLuint Tex = loadBMP_custom("download.bmp");//Try these images: colors.bmp, parts.bmp
+
+   // Get a handle for our "myTextureSampler" uniform
+    GLuint TexID  = glGetUniformLocation(programID, "myTextureSampler");
+
+    scene->vertexPosition_modelspaceID = vertexPosition_modelspaceID;
+    scene->vertexUVID = vertexUVID;
+    scene->Texture = Tex;
+    scene->TextureID = TexID;
+    //
+    // The scene ends
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
     // The player
+    printf("main::main(): making player\n");
 
     // Define our player
     Player * player = new Player(CENTER, vec3(0, 0, 0));
@@ -105,7 +134,7 @@ int main( void )
     GLuint p_vertexUVID = glGetAttribLocation(programID, "vertexUV");
 
     // Load the texture
-    GLuint p_Texture = loadBMP_custom("Dropship_D.bmp");
+    GLuint p_Texture = loadBMP_custom("planeMonster.bmp");
 
     // Get a handle for our "myTextureSampler" uniform
     GLuint p_TextureID  = glGetUniformLocation(programID, "myTextureSampler");
@@ -114,7 +143,7 @@ int main( void )
     std::vector<glm::vec3> p_vertices;
     std::vector<glm::vec2> p_uvs;
     std::vector<glm::vec3> p_normals; // Won't be used at the moment.
-    loadOBJ("Dropship.obj", p_vertices, p_uvs, p_normals);
+    loadOBJ("planeMonster.obj", p_vertices, p_uvs, p_normals);
 
     // Load it into a VBO
     GLuint p_vertexbuffer;
@@ -139,6 +168,7 @@ int main( void )
 
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
     // The bullet begins
+    printf("main::main() making bullets\n");
 
     static const GLfloat g_vertex_buffer_data[] = {
             -1.0f,-1.0f,-1.0f,
@@ -238,11 +268,87 @@ int main( void )
     // The bullets ends
     // /////////////////////////////////////////////////////////////////////////////////////////////////
 
-    ///  -----------------------------------------* Rendering *-----------------------------------------
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
+    // The Monster
+
+    // Get a handle for our buffers
+    GLuint m_vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
+    GLuint m_vertexUVID = glGetAttribLocation(programID, "vertexUV");
+
+    // Load the texture
+    GLuint m_Texture = loadBMP_custom("Dropship_D.bmp");
+
+    // Get a handle for our "myTextureSampler" uniform
+    GLuint m_TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+
+    // Read our .obj file
+    std::vector<glm::vec3> m_vertices;
+    std::vector<glm::vec2> m_uvs;
+    std::vector<glm::vec3> m_normals; // Won't be used at the moment.
+    loadOBJ("Dropship.obj", m_vertices, m_uvs, m_normals);
+
+    // Load it into a VBO
+    GLuint m_vertexbuffer;
+    glGenBuffers(1, &m_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(glm::vec3), &m_vertices[0], GL_STATIC_DRAW);
+
+    GLuint m_uvbuffer;
+    glGenBuffers(1, &m_uvbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
+    glBufferData(GL_ARRAY_BUFFER, m_uvs.size() * sizeof(glm::vec2), &m_uvs[0], GL_STATIC_DRAW);
+
+    std::vector<Monster *> monsters;
+
+    //
+    // The monster ends
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
+    // The Obstecles begins
+
+    GLuint O_vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
+    //GLuint O_vertexColorID = glGetAttribLocation(programID, "vertexColor");
+    // Get a handle for our "myTextureSampler" uniform
+    GLuint O_TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+    GLuint O_vertexUVID = glGetAttribLocation(programID, "vertexUV");
+
+    // Load the texture
+    GLuint O_Texture = loadBMP_custom("obstcale.bmp");
+
+    // Read our .obj file
+    std::vector<glm::vec3> O_vertices;
+    std::vector<glm::vec2> O_uvs;
+    std::vector<glm::vec3> O_normals; // Won't be used at the moment.
+    loadOBJ("obstcale.obj", O_vertices, O_uvs, O_normals);
+
+    // Load it into a VBO
+    GLuint O_vertexbuffer;
+    glGenBuffers(1, &O_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, O_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, O_vertices.size() * sizeof(glm::vec3), &O_vertices[0], GL_STATIC_DRAW);
+
+    GLuint O_uvbuffer;
+    glGenBuffers(1, &O_uvbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, O_uvbuffer);
+    glBufferData(GL_ARRAY_BUFFER, O_uvs.size() * sizeof(glm::vec2), &O_uvs[0], GL_STATIC_DRAW);
+
+
+    std::vector<Obstecle *> obstecles;
+
+    //
+    // The Obstecles ends
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ///  -----------------------------------------* Game Loop *-----------------------------------------
+
+    printf("main::main() entering game loop\n");
 
     double lastTime = glfwGetTime(), deltaTime=0.0f;
     int bulletUpdates = 0;
-
+    bool addMonster = true;
+    float posx, posy, posz=20;
+    int numberOfObstecles = 0;
     do{
 
         // Clear the screen
@@ -251,13 +357,15 @@ int main( void )
         // Use our shader
         glUseProgram(programID);
 
-        /// Update gameobjects state
         deltaTime += (glfwGetTime() - lastTime) *  UPDATES_PER_SECOND;
         lastTime = glfwGetTime();
+
+        ///  -----------------------------------------* Update gameobjects state *---------------------------------
         //get user action and execute it
         if (deltaTime >= 3.0f)
         {
             player->update(window);
+
             deltaTime-= 3.0f;
             bulletUpdates++;
 
@@ -267,6 +375,19 @@ int main( void )
                 (*it)->update(window);
             }
 
+            // update monsters
+            for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
+            {
+                (*it)->update(window);
+            }
+
+            // update obstecles
+            for (std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
+            {
+                (*it)->update(window);
+            }
+
+            // check to add new monster and player
             if (bulletUpdates >= 5)
             {
                 bulletUpdates -= 5;
@@ -279,10 +400,75 @@ int main( void )
                     bullets.push_back(bullet);
                 }
             }
+
+            // Generate the random positions for the enemy planes
+            posx = (rand() % (MAX_NEGATIVE_X * 2)) - MAX_POSITIVE_X;
+            posy = (rand() % (MAX_POSITIVE_Y+2)) - 3;   ///TODO: fix the y-axis random number
+
+            if (addMonster)
+            {
+                Monster * monster = new Monster(CENTER, vec3(posx, posy, posz));
+                monster->setIDs(m_vertexPosition_modelspaceID, m_vertexUVID, m_uvbuffer, m_vertexbuffer, 0, 0);
+                monster->setNormals(m_normals);
+                monster->setTexture(m_TextureID, m_Texture);
+                monster->setUVs(m_uvs);
+                monster->setVertices(m_vertices);
+
+                monsters.push_back(monster);
+            }
+
+            //numberOfObstecles = rand() % 3;
+
+
+            if (numberOfObstecles < 2)
+            {
+                posx = (rand() % (MAX_NEGATIVE_X * 2)) - MAX_POSITIVE_X;
+                posy = (rand() % (MAX_POSITIVE_Y+2)) - 3;   ///TODO: fix the y-axis random number
+
+                Obstecle * obstecle = new Obstecle(CENTER, vec3(posx, posy, posz));
+                obstecle->setIDs(O_vertexPosition_modelspaceID, O_vertexUVID, O_uvbuffer, O_vertexbuffer, 0, 0);
+                obstecle->setNormals(O_normals);
+                obstecle->setTexture(O_TextureID, O_Texture);
+                obstecle->setUVs(O_uvs);
+                obstecle->setVertices(O_vertices);
+
+                obstecles.push_back(obstecle);
+
+                numberOfObstecles ++;
+            }
         }
 
-        // Draw the player
+        ///  -----------------------------------------* Rendering *-----------------------------------------
+
+        // Draw the objects
         player->render(MatrixID, Projection, View);
+        scene->render(MatrixID, Projection, View);
+
+        //check for dead bullets
+        std::vector < std::vector<Monster *>::iterator > deletedMonsters;
+        for(std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
+        {
+            if (!((*it)->isInRange()))
+            {
+                delete (*it);
+                deletedMonsters.push_back(it);
+                addMonster = true;
+            }
+            else
+                addMonster = false;
+        }
+
+        //remove dead monsters
+        for(std::vector < std::vector<Monster *>::iterator >::iterator deleteIterator = deletedMonsters.begin(); deleteIterator != deletedMonsters.end(); deleteIterator++)
+        {
+            monsters.erase(*deleteIterator);
+        }
+
+        // Draw the bullets
+        for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
+        {
+            (*it)->render(MatrixID, Projection, View);
+        }
 
         //check for dead bullets
         std::vector < std::vector<Bullet *>::iterator > deletedBullets;
@@ -307,6 +493,31 @@ int main( void )
             (*it)->render(MatrixID, Projection, View);
         }
 
+        //check for dead obstecles
+        std::vector < std::vector<Obstecle *>::iterator > deletedObstecles;
+
+        for(std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
+        {
+            if (!((*it)->isInRange()))
+            {
+                delete (*it);
+                deletedObstecles.push_back(it);
+                numberOfObstecles--;
+            }
+        }
+
+        //remove dead obstecles
+        for(std::vector < std::vector<Obstecle *>::iterator >::iterator deleteIterator = deletedObstecles.begin(); deleteIterator != deletedObstecles.end(); deleteIterator++)
+        {
+            obstecles.erase(*deleteIterator);
+        }
+
+        // Draw the obstecles
+        for(std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
+        {
+            (*it)->render(MatrixID, Projection, View);
+        }
+
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -317,21 +528,49 @@ int main( void )
 
     /// Termination
 
+    printf("main::main() terminating\n");
+
     // Cleanup VBO and shader
     player->releaseResources();
     for (std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
     {
         (*it)->releaseResources();
     }
+    for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
+    {
+        (*it)->releaseResources();
+    }
+    for (std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
+    {
+        (*it)->releaseResources();
+    }
     glDeleteProgram(programID);
     player->releaseTexture();
+    for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
+    {
+        (*it)->releaseTexture();
+    }
+    for (std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
+    {
+        (*it)->releaseTexture();
+    }
 
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
 
+    //delete objects
+    delete scene;
     delete player;
 
     for (std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    {
+        delete (*it);
+    }
+    for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
+    {
+        delete (*it);
+    }
+    for (std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
     {
         delete (*it);
     }

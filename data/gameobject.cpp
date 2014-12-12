@@ -52,7 +52,7 @@ std::vector< glm::vec2 > GameObject::getUVs() const
 }
 
 // Sets the UVs
-void GameObject::setUVs(std::vector<vec2> v)
+void GameObject::setUVs(const std::vector<vec2> &v)
 {
     this->_uvs = v;
 }
@@ -64,7 +64,7 @@ std::vector< glm::vec3 > GameObject::getVertices() const
 }
 
 // Sets the vertices
-void GameObject::setVertices(std::vector<vec3> v)
+void GameObject::setVertices(const std::vector<vec3> &v)
 {
     this->_vertices = v;
 }
@@ -76,21 +76,21 @@ std::vector< glm::vec3 > GameObject::getNormals() const
 }
 
 // Sets the normal
-void GameObject::setNormals(std::vector<vec3> v)
+void GameObject::setNormals(const std::vector<vec3> &v)
 {
     this->_normals = v;
 }
 
 // Sets the texture
-void GameObject::setTexture(GLuint tid, GLuint t)
+void GameObject::setTexture(const GLuint &tid, const GLuint &t)
 {
     this->texture = t;
     this->textureID = tid;
 }
 
 // Sets handler IDS
-void GameObject::setIDs(GLuint vertexPosition_modelspaceID, GLuint vertexUVID, GLuint uvbuffer,
-            GLuint vertexbuffer, GLuint vertexColorID, GLuint colorbuffer)
+void GameObject::setIDs(const GLuint &vertexPosition_modelspaceID, const GLuint &vertexUVID, const GLuint &uvbuffer,
+                        const GLuint &vertexbuffer, const GLuint &vertexColorID, const GLuint &colorbuffer)
 {
     this->vertexPosition_modelspaceID = vertexPosition_modelspaceID;
     this->vertexUVID = vertexUVID;
@@ -104,4 +104,9 @@ void GameObject::setIDs(GLuint vertexPosition_modelspaceID, GLuint vertexUVID, G
 void GameObject::releaseTexture()
 {
     // We don't have one. Nothing to do here!
+}
+
+Collider GameObject::getCollider() const
+{
+return this->collider;
 }

@@ -50,23 +50,28 @@ public:
 
     //get the vertices of the object
     std::vector< glm::vec3 > getVertices() const;
-    void setVertices(std::vector< glm::vec3 > v);
+    void setVertices(const std::vector< glm::vec3 > &v);
 
     //get the UVs of the object
     std::vector< glm::vec2 > getUVs() const;
-    void setUVs(std::vector< glm::vec2 > v);
+    void setUVs(const std::vector< glm::vec2 > &v);
 
     //get the normals of the object
     std::vector< glm::vec3 > getNormals() const;
-    void setNormals(std::vector< glm::vec3 > v);
+    void setNormals(const std::vector< glm::vec3 > &v);
 
-    void setTexture(GLuint tid, GLuint t);
+    //set the handlers for the texture of the object
+    void setTexture(const GLuint &tid, const GLuint &t);
 
-    void setIDs(GLuint vertexPosition_modelspaceID, GLuint vertexUVID, GLuint uvbuffer,
-                GLuint vertexbuffer, GLuint vertexColorID, GLuint colorbuffer);
+    //set the handler of vertices, colors and UVs of the object
+    void setIDs(const GLuint &vertexPosition_modelspaceID, const GLuint &vertexUVID, const GLuint &uvbuffer,
+                const GLuint &vertexbuffer, const GLuint &vertexColorID, const GLuint &colorbuffer);
 
+    //get the collider of the game object
+    Collider getCollider() const;
 protected:
     //define the lane which the object in
+    //@deprecicated
     Lane _lane;
 
     //type of game object
@@ -112,6 +117,17 @@ protected:
 
     glm::mat4 ScalingMatrix;
 
+    //angle of rotation around x-axis
+    float anglex;
+
+    //angle of rotation around z-axis
+    float anglez;
+
+    //angle of rotation around y-axis
+    float angley;
+
+    //collider object
+    Collider collider;
 };
 
 #endif // GAMEOBJECT_H

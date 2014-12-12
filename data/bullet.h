@@ -29,9 +29,6 @@ private:
     //bullet is still alive
     bool inRange;
 
-    // Bullet rotation angle
-    float angle;
-
     // Number of bullet objects created
     static int bulletCount;
 };

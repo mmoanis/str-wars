@@ -9,9 +9,11 @@ Bullet::Bullet(Lane lane, vec3 position): GameObject(lane, position, BULLET)
     bulletCount++;
     printf("Bullet::Bullet() created bullet #%d at x=%d y=%d z=%d\n", bulletCount, (int)position.x, (int)position.y, (int)position.z);
     inRange = true;
-    angle = 3;
-    RotationMatrix = eulerAngleYXZ(0.0f, 0.0f,angle);
-    ScalingMatrix = scale(mat4(), vec3(0.1f, 0.1f, 0.1f));
+    anglez = 3;
+    anglex = 0;
+    angley = 0;
+    RotationMatrix = eulerAngleYXZ(angley, anglex,anglez);
+    ScalingMatrix = scale(mat4(), vec3(0.05f, 0.05f, 0.05f));
 }
 
 // Destructor
@@ -99,11 +101,11 @@ void Bullet::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &
 void Bullet::update(GLFWwindow* window)
 {
     //update bullet position
-    if (_position.z < MAX_POSITIVE_Z)
+    if (_position.z < BULLET_BARRIER)
         _position.z++;
     else
         inRange = false;    //mark dead
 
-    angle++;
-    RotationMatrix = eulerAngleYXZ(0.0f, 0.0f,angle);
+    anglez++;
+    RotationMatrix = eulerAngleYXZ(angley, anglex,anglez);
 }
