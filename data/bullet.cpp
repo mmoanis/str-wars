@@ -12,20 +12,15 @@ Bullet::Bullet(Lane lane, vec3 position): GameObject(lane, position, BULLET)
     anglez = 3;
     anglex = 0;
     angley = 0;
+    scalex = scaley = scalez = 0.05;
     RotationMatrix = eulerAngleYXZ(angley, anglex,anglez);
-    ScalingMatrix = scale(mat4(), vec3(0.05f, 0.05f, 0.05f));
+    ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
 }
 
 // Destructor
 Bullet::~Bullet()
 {
     printf("Bullet::~Bullet() destructed bullet #%d at x=%d y=%d z=%d\n", bulletCount, (int)_position.x, (int)_position.y, (int)_position.z);
-}
-
-void Bullet::releaseResources()
-{
-    glDeleteBuffers(1, &vertexbuffer);
-    glDeleteBuffers(1, &colorbuffer);
 }
 
 // Gets is in screen range
@@ -78,7 +73,7 @@ void Bullet::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &
     );
 
     // 2nd attribute buffer : colors
-    glEnableVertexAttribArray(vertexColorID);
+   /* glEnableVertexAttribArray(vertexColorID);
     glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
     glVertexAttribPointer(
             vertexColorID,               // The attribute we want to configure
@@ -87,7 +82,7 @@ void Bullet::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &
             GL_FALSE,                    // normalized?
             0,                           // stride
             (void*)0                     // array buffer offset
-    );
+    );*/
 
     // Draw the triangleS !
     glDrawArrays(GL_TRIANGLES, 0, 12*3); // 12*3 indices starting at 0 -> 12 triangles

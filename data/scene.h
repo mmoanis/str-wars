@@ -15,25 +15,29 @@ using namespace glm;
 
 #include <common/shader.hpp>
 #include <common/texture.hpp>
+
+#include <glm/gtx/euler_angles.hpp>//rotation
+#include <glm/gtx/norm.hpp>//rotation
 class Scene
 {
 public:
     Scene();
-   inline  ~Scene(){ printf("Game Ended");}
-   void render(const GLuint MatrixID, const mat4 Projection, const mat4 View);
+    inline  ~Scene(){}
+    void render(const GLuint MatrixID, const mat4 Projection, const mat4 View);
 
-  glm::mat4 MVP;
- GLuint vertexPosition_modelspaceID;
-	GLuint vertexUVID ;
- GLuint Texture;
-GLuint TextureID;
-glm::mat4 Model;
- GLuint MatrixID ;
-        GLuint ViewMatrixID ;
-        GLuint ModelMatrixID ;
-GLuint vertexbuffer;
-GLuint uvbuffer;
-
+    //
+    glm::mat4 MVP;
+    GLuint vertexPosition_modelspaceID;
+    GLuint vertexUVID ;
+    GLuint Texture;
+    GLuint TextureID;
+    glm::mat4 Model;
+    GLuint MatrixID ;
+    GLuint ViewMatrixID ;
+    GLuint ModelMatrixID ;
+    GLuint vertexbuffer;
+    GLuint uvbuffer;
+    float x;
 
 };
 

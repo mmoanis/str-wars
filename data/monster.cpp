@@ -8,10 +8,10 @@ Monster::Monster(Lane lane, vec3 position): GameObject(lane, position, PLAYER)
     angley = 3.14;
     anglex = 0;
     anglez = 0;
+    scalex = scaley = scalez = 0.02;
     printf("Monster::Monster() created monster #%d at x=%d y=%d z=%d\n", monsterCount, (int)position.x, (int)position.y, (int)position.z);
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
-    //ScalingMatrix = scale(mat4(), vec3(0.005f, 0.005f, 0.005f));
-    ScalingMatrix = scale(mat4(), vec3(0.05f, 0.05f, 0.05f));
+    ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
     inRange = true;
 }
 
@@ -26,20 +26,6 @@ bool Monster::checkCollision(GameObject *)
     // TODO: implement collision detection
     return false;
 }
-// Release handlers IDs
-void Monster::releaseResources()
-{
-    //delete the handles
-    glDeleteBuffers(1, &vertexbuffer);
-    glDeleteBuffers(1, &uvbuffer);
-}
-
-// Release the textures
-void Monster::releaseTexture()
-{
-    //delete the handles
-    glDeleteTextures(1, &textureID);
-}
 
 // Initialize object state
 // @Deprecated: use constructor instead
@@ -50,7 +36,7 @@ void Monster::setup()
 void Monster::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
     //make the matrices for the transformation
-    TranslationMatrix = translate(mat4(), vec3((int)_position.x, 0.0f,(int)_position.z));
+    TranslationMatrix = translate(mat4(), vec3((int)_position.x, (int)_position.y,(int)_position.z));
 
     glm::mat4 Model = TranslationMatrix* RotationMatrix* ScalingMatrix;//order of multiplication is important (try different values above and different order of multiplication)
 
@@ -105,7 +91,7 @@ void Monster::update(GLFWwindow* window)
     //get user input
     if (_position.z >= MAX_NEGATIVE_Z)
     {
-        _position.z-= 0.5;
+        _position.z--;
     }
     else
         inRange = false;

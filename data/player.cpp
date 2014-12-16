@@ -4,13 +4,16 @@
 Player::Player(Lane lane, vec3 position): GameObject(lane, position, PLAYER)
 {
     printf("Player::Player() at x=%d y=%d z=%d\n", (int)position.x, (int)position.y, (int)position.z);
-    RotationMatrix = eulerAngleYXZ(0.0f, 0.5f, 0.0f);//yaw, pitch and roll. Measured in radians
-    //ScalingMatrix = scale(mat4(), vec3(0.05f, 0.05f, 0.05f));
-    ScalingMatrix = scale(mat4(), vec3(0.005f, 0.005f, 0.005f));
+
     _health = 100;
     anglex = 0.0;
     anglez = 0;
     angley = 3.14;
+    scalex = scaley = scalez = 0.002;
+
+    RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
+    //ScalingMatrix = scale(mat4(), vec3(0.05f, 0.05f, 0.05f));
+    ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
 }
 
 // Destructor
@@ -24,21 +27,6 @@ bool Player::checkCollision(GameObject *)
 {
     // TODO: implement collision detection
     return false;
-}
-
-// Release handlers IDs
-void Player::releaseResources()
-{
-    //delete the handles
-    glDeleteBuffers(1, &vertexbuffer);
-    glDeleteBuffers(1, &uvbuffer);
-}
-
-// Release the textures
-void Player::releaseTexture()
-{
-    //delete the handles
-    glDeleteTextures(1, &textureID);
 }
 
 // Initialize object state

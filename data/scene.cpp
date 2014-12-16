@@ -88,12 +88,15 @@ Scene::Scene()
     glGenBuffers(1, &uvbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
+
+    x = 0;
 }
 
 void Scene :: render(const GLuint MatrixID, const mat4 Projection, const mat4 View)
 {
     glm::mat4 ScalingMatrix = scale(mat4(), vec3(30.0f,30.0f,30.0f));
     glm::mat4   TranslationMatrix = translate(mat4(), vec3(0.0f, 0.0f,50.0f));
+    //glm::mat4 RotationMatrix = eulerAngleYXZ(0.0f, x, 0.0f);
     MVP = Projection * View*TranslationMatrix*ScalingMatrix  ;
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 

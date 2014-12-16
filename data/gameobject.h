@@ -28,12 +28,6 @@ public:
     //Checks collision with another GameObject
     virtual bool checkCollision(GameObject *) = 0;
 
-    //release handlers
-    virtual void releaseResources() = 0;
-
-    //release texture
-    virtual void releaseTexture();
-
     //virtual void makeSoundEffect() = 0;
 
     //gets the type of the object
@@ -125,6 +119,12 @@ protected:
 
     //angle of rotation around y-axis
     float angley;
+
+    float scalex;
+
+    float scaley;
+
+    float scalez;
 
     //collider object
     Collider collider;

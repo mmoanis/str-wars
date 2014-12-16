@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <vector>
 #include <math.h>
+#include <memory>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -92,7 +93,7 @@ int main( void )
     glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
     // Camera matrix
     glm::mat4 View       = glm::lookAt(
-                 glm::vec3(0,2,-10), //position
+                 glm::vec3(0.1,2,-10), //position
                  glm::vec3(0,0,0), // and looks at the origin
                  glm::vec3(0,1,0)  // Head is up
                  );
@@ -209,58 +210,12 @@ int main( void )
              1.0f,-1.0f, 1.0f
     };
 
-    // One color for each vertex. They were generated randomly.
-    static const GLfloat g_color_buffer_data[] = {
-            0.583f,  0.771f,  0.014f,
-            0.609f,  0.115f,  0.436f,
-            0.327f,  0.483f,  0.844f,
-            0.822f,  0.569f,  0.201f,
-            0.435f,  0.602f,  0.223f,
-            0.310f,  0.747f,  0.185f,
-            0.597f,  0.770f,  0.761f,
-            0.559f,  0.436f,  0.730f,
-            0.359f,  0.583f,  0.152f,
-            0.483f,  0.596f,  0.789f,
-            0.559f,  0.861f,  0.639f,
-            0.195f,  0.548f,  0.859f,
-            0.014f,  0.184f,  0.576f,
-            0.771f,  0.328f,  0.970f,
-            0.406f,  0.615f,  0.116f,
-            0.676f,  0.977f,  0.133f,
-            0.971f,  0.572f,  0.833f,
-            0.140f,  0.616f,  0.489f,
-            0.997f,  0.513f,  0.064f,
-            0.945f,  0.719f,  0.592f,
-            0.543f,  0.021f,  0.978f,
-            0.279f,  0.317f,  0.505f,
-            0.167f,  0.620f,  0.077f,
-            0.347f,  0.857f,  0.137f,
-            0.055f,  0.953f,  0.042f,
-            0.714f,  0.505f,  0.345f,
-            0.783f,  0.290f,  0.734f,
-            0.722f,  0.645f,  0.174f,
-            0.302f,  0.455f,  0.848f,
-            0.225f,  0.587f,  0.040f,
-            0.517f,  0.713f,  0.338f,
-            0.053f,  0.959f,  0.120f,
-            0.393f,  0.621f,  0.362f,
-            0.673f,  0.211f,  0.457f,
-            0.820f,  0.883f,  0.371f,
-            0.982f,  0.099f,  0.879f
-    };
-
     GLuint b_vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
-    GLuint b_vertexColorID = glGetAttribLocation(programID, "vertexColor");
 
     GLuint b_vertexbuffer;
     glGenBuffers(1, &b_vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, b_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-    GLuint b_colorbuffer;
-    glGenBuffers(1, &b_colorbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, b_colorbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 
     std::vector<Bullet *> bullets;
 
@@ -314,25 +269,61 @@ int main( void )
     GLuint O_vertexUVID = glGetAttribLocation(programID, "vertexUV");
 
     // Load the texture
-    GLuint O_Texture = loadBMP_custom("obstcale.bmp");
+    GLuint O_Texture[5] = { loadBMP_custom("obstcale.bmp"), loadBMP_custom("AM1.bmp"), loadBMP_custom("Am2.bmp"),
+                            loadBMP_custom("AM3.bmp"), loadBMP_custom("Am4.bmp") };
 
     // Read our .obj file
-    std::vector<glm::vec3> O_vertices;
-    std::vector<glm::vec2> O_uvs;
-    std::vector<glm::vec3> O_normals; // Won't be used at the moment.
-    loadOBJ("obstcale.obj", O_vertices, O_uvs, O_normals);
+    std::vector<glm::vec3> O_vertices[5];
+    std::vector<glm::vec2> O_uvs[5];
+    std::vector<glm::vec3> O_normals[5];
+    loadOBJ("asteroid11.obj", O_vertices[0], O_uvs[0], O_normals[0]);
+    loadOBJ("asteroid23.obj", O_vertices[1], O_uvs[1], O_normals[1]);
+    loadOBJ("obstcale.obj", O_vertices[2], O_uvs[2], O_normals[2]);
+    loadOBJ("asteroid7.obj", O_vertices[3], O_uvs[3], O_normals[3]);
+    loadOBJ("asteroid27.obj", O_vertices[4], O_uvs[4], O_normals[4]);
 
     // Load it into a VBO
-    GLuint O_vertexbuffer;
-    glGenBuffers(1, &O_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, O_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, O_vertices.size() * sizeof(glm::vec3), &O_vertices[0], GL_STATIC_DRAW);
+    GLuint O_vertexbuffer[5];
+    glGenBuffers(1, &O_vertexbuffer[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, O_vertexbuffer[0]);
+    glBufferData(GL_ARRAY_BUFFER, (O_vertices)[0].size() * sizeof(glm::vec3), &O_vertices[0][0], GL_STATIC_DRAW);
 
-    GLuint O_uvbuffer;
-    glGenBuffers(1, &O_uvbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, O_uvbuffer);
-    glBufferData(GL_ARRAY_BUFFER, O_uvs.size() * sizeof(glm::vec2), &O_uvs[0], GL_STATIC_DRAW);
+    glGenBuffers(1, &O_vertexbuffer[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, O_vertexbuffer[1]);
+    glBufferData(GL_ARRAY_BUFFER, (O_vertices[1]).size() * sizeof(glm::vec3), &O_vertices[1][0], GL_STATIC_DRAW);
 
+    glGenBuffers(1, &O_vertexbuffer[2]);
+    glBindBuffer(GL_ARRAY_BUFFER, O_vertexbuffer[2]);
+    glBufferData(GL_ARRAY_BUFFER, (O_vertices[2]).size() * sizeof(glm::vec3), &O_vertices[2][0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &O_vertexbuffer[3]);
+    glBindBuffer(GL_ARRAY_BUFFER, O_vertexbuffer[3]);
+    glBufferData(GL_ARRAY_BUFFER, (O_vertices[3]).size() * sizeof(glm::vec3), &O_vertices[3][0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &O_vertexbuffer[4]);
+    glBindBuffer(GL_ARRAY_BUFFER, O_vertexbuffer[4]);
+    glBufferData(GL_ARRAY_BUFFER, (O_vertices[4]).size() * sizeof(glm::vec3), &O_vertices[4][0], GL_STATIC_DRAW);
+
+    GLuint O_uvbuffer[5];
+    glGenBuffers(1, &O_uvbuffer[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, O_uvbuffer[0]);
+    glBufferData(GL_ARRAY_BUFFER, (O_uvs[0]).size() * sizeof(glm::vec2), &O_uvs[0][0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &O_uvbuffer[1]);
+    glBindBuffer(GL_ARRAY_BUFFER, O_uvbuffer[1]);
+    glBufferData(GL_ARRAY_BUFFER, (O_uvs[1]).size() * sizeof(glm::vec2), &O_uvs[1][0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &O_uvbuffer[2]);
+    glBindBuffer(GL_ARRAY_BUFFER, O_uvbuffer[2]);
+    glBufferData(GL_ARRAY_BUFFER, (O_uvs[2]).size() * sizeof(glm::vec2), &O_uvs[2][0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &O_uvbuffer[3]);
+    glBindBuffer(GL_ARRAY_BUFFER, O_uvbuffer[3]);
+    glBufferData(GL_ARRAY_BUFFER, (O_uvs[3]).size() * sizeof(glm::vec2), &O_uvs[3][0], GL_STATIC_DRAW);
+
+    glGenBuffers(1, &O_uvbuffer[4]);
+    glBindBuffer(GL_ARRAY_BUFFER, O_uvbuffer[4]);
+    glBufferData(GL_ARRAY_BUFFER, (O_uvs[4]).size() * sizeof(glm::vec2), &O_uvs[4][0], GL_STATIC_DRAW);
 
     std::vector<Obstecle *> obstecles;
 
@@ -348,7 +339,14 @@ int main( void )
     int bulletUpdates = 0;
     bool addMonster = true;
     float posx, posy, posz=20;
-    int numberOfObstecles = 0;
+    int numberOfObstecles = 2;
+    float obsteclesUpdate = 0;
+    float distance = 0; //distance covered by player
+
+    std::vector < std::vector<Obstecle* >::iterator > deletedObstecles;
+    std::vector < std::vector<Bullet* >::iterator > deletedBullets;
+    std::vector < std::vector<Monster* >::iterator > deletedMonsters;
+
     do{
 
         // Clear the screen
@@ -365,28 +363,102 @@ int main( void )
         if (deltaTime >= 3.0f)
         {
             player->update(window);
-
+            if (scene->x  > -20)
+                scene->x -= 0.03;
+            else
+            {
+                scene->x  = 0;
+                //x->
+            }
             deltaTime-= 3.0f;
             bulletUpdates++;
 
             // update bullets
-            for (std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
+            for (std::vector<Bullet *> ::iterator it = bullets.begin(); it != bullets.end(); it++)
             {
                 (*it)->update(window);
             }
 
             // update monsters
-            for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
+            for (std::vector<Monster*>::iterator it = monsters.begin(); it != monsters.end(); it++)
             {
                 (*it)->update(window);
             }
 
             // update obstecles
-            for (std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
+            for (std::vector<Obstecle*>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
             {
                 (*it)->update(window);
             }
 
+            /// removing dead* objects
+            ///
+            ///
+            ///
+
+
+            //check for dead bullets
+            for(std::vector<Bullet* >::iterator it = bullets.begin(); it != bullets.end(); it++)
+            {
+                if (!((*it)->isInRange()))
+                {
+                    deletedBullets.push_back(it);
+                }
+            }
+
+            //check for dead monsters
+            for(std::vector<Monster* >::iterator it = monsters.begin(); it != monsters.end(); it++)
+            {
+                if (!((*it)->isInRange()))
+                {
+                    deletedMonsters.push_back(it);
+                    addMonster = true;
+                }
+                else
+                    addMonster = false;
+            }
+
+            //check for dead obstecles
+            for(std::vector<Obstecle*>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
+            {
+                if (!((*it)->isInRange()))
+                {
+                    deletedObstecles.push_back(it);
+                    numberOfObstecles--;
+                }
+            }
+
+            //remove dead bullets
+            for(std::vector < std::vector<Bullet* >::iterator >::iterator deleteIterator = deletedBullets.begin(); deleteIterator != deletedBullets.end(); deleteIterator++)
+            {
+                Bullet * bullet = **deleteIterator;
+                bullets.erase(*deleteIterator);
+                delete bullet;
+            }
+
+            //remove dead monsters
+            for(std::vector < std::vector<Monster* >::iterator >::iterator deleteIterator = deletedMonsters.begin(); deleteIterator != deletedMonsters.end(); deleteIterator++)
+            {
+                Monster * monster = **deleteIterator;
+                monsters.erase(*deleteIterator);
+                delete monster;
+            }
+
+            //remove dead obstecles
+            for(std::vector < std::vector<Obstecle* >::iterator >::iterator deleteIterator = deletedObstecles.begin(); deleteIterator != deletedObstecles.end(); deleteIterator++)
+            {
+                Obstecle * obstecle = **deleteIterator;
+                obstecles.erase(*deleteIterator);
+                delete obstecle;
+            }
+
+            deletedObstecles.clear();
+            deletedBullets.clear();
+            deletedMonsters.clear();
+
+
+            /// add new objects
+            ///
             // check to add new monster and player
             if (bulletUpdates >= 5)
             {
@@ -395,7 +467,7 @@ int main( void )
                 if (glfwGetKey( window, GLFW_KEY_SPACE) == GLFW_PRESS )
                 {
                     Bullet * bullet = new Bullet(player->getLane(), player->getPosition());
-                    bullet->setIDs(b_vertexPosition_modelspaceID, 0, 0, b_vertexbuffer, b_vertexColorID, b_colorbuffer);
+                    bullet->setIDs(b_vertexPosition_modelspaceID, 0, 0, b_vertexbuffer, 0, 0);
 
                     bullets.push_back(bullet);
                 }
@@ -403,11 +475,11 @@ int main( void )
 
             // Generate the random positions for the enemy planes
             posx = (rand() % (MAX_NEGATIVE_X * 2)) - MAX_POSITIVE_X;
-            posy = (rand() % (MAX_POSITIVE_Y+2)) - 3;   ///TODO: fix the y-axis random number
+            posy = (rand() % ((MAX_POSITIVE_Y+2) *2)) - MAX_POSITIVE_Y - 2;
 
             if (addMonster)
             {
-                Monster * monster = new Monster(CENTER, vec3(posx, posy, posz));
+                Monster* monster = new Monster(CENTER, vec3(posx, posy, posz));
                 monster->setIDs(m_vertexPosition_modelspaceID, m_vertexUVID, m_uvbuffer, m_vertexbuffer, 0, 0);
                 monster->setNormals(m_normals);
                 monster->setTexture(m_TextureID, m_Texture);
@@ -417,24 +489,26 @@ int main( void )
                 monsters.push_back(monster);
             }
 
-            //numberOfObstecles = rand() % 3;
-
-
-            if (numberOfObstecles < 2)
+            obsteclesUpdate++;
+            // TODO: fix mathimatical formula for positions
+            if (obsteclesUpdate > 10)
             {
-                posx = (rand() % (MAX_NEGATIVE_X * 2)) - MAX_POSITIVE_X;
-                posy = (rand() % (MAX_POSITIVE_Y+2)) - 3;   ///TODO: fix the y-axis random number
-
-                Obstecle * obstecle = new Obstecle(CENTER, vec3(posx, posy, posz));
-                obstecle->setIDs(O_vertexPosition_modelspaceID, O_vertexUVID, O_uvbuffer, O_vertexbuffer, 0, 0);
-                obstecle->setNormals(O_normals);
-                obstecle->setTexture(O_TextureID, O_Texture);
-                obstecle->setUVs(O_uvs);
-                obstecle->setVertices(O_vertices);
+                ///TODO: fix the y-axis random number
+                posx = (rand() % (MAX_POSITIVE_X * 2)) - MAX_POSITIVE_X;
+                posy = (rand() % ((MAX_POSITIVE_Y+2) *2)) - MAX_POSITIVE_Y-2;
+                int i = rand() % 5;
+                Obstecle *obstecle = new Obstecle(CENTER, vec3(posx, posy, 40));
+                obstecle->setIDs(O_vertexPosition_modelspaceID, O_vertexUVID, O_uvbuffer[i], O_vertexbuffer[i], 0, 0);
+                obstecle->setNormals(O_normals[i]);
+                obstecle->setTexture(O_TextureID, O_Texture[rand() % 5]);
+                obstecle->setUVs(O_uvs[i]);
+                obstecle->setVertices(O_vertices[i]);
 
                 obstecles.push_back(obstecle);
 
                 numberOfObstecles ++;
+
+                obsteclesUpdate -= 10;
             }
         }
 
@@ -444,72 +518,16 @@ int main( void )
         player->render(MatrixID, Projection, View);
         scene->render(MatrixID, Projection, View);
 
-        //check for dead bullets
-        std::vector < std::vector<Monster *>::iterator > deletedMonsters;
-        for(std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
-        {
-            if (!((*it)->isInRange()))
-            {
-                delete (*it);
-                deletedMonsters.push_back(it);
-                addMonster = true;
-            }
-            else
-                addMonster = false;
-        }
-
-        //remove dead monsters
-        for(std::vector < std::vector<Monster *>::iterator >::iterator deleteIterator = deletedMonsters.begin(); deleteIterator != deletedMonsters.end(); deleteIterator++)
-        {
-            monsters.erase(*deleteIterator);
-        }
-
-        // Draw the bullets
+        // Draw the monsters
         for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
         {
             (*it)->render(MatrixID, Projection, View);
-        }
-
-        //check for dead bullets
-        std::vector < std::vector<Bullet *>::iterator > deletedBullets;
-        for(std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
-        {
-            if (!((*it)->isInRange()))
-            {
-                delete (*it);
-                deletedBullets.push_back(it);
-            }
-        }
-
-        //remove dead bullets
-        for(std::vector < std::vector<Bullet *>::iterator >::iterator deleteIterator = deletedBullets.begin(); deleteIterator != deletedBullets.end(); deleteIterator++)
-        {
-            bullets.erase(*deleteIterator);
         }
 
         // Draw the bullets
         for (std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
         {
             (*it)->render(MatrixID, Projection, View);
-        }
-
-        //check for dead obstecles
-        std::vector < std::vector<Obstecle *>::iterator > deletedObstecles;
-
-        for(std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
-        {
-            if (!((*it)->isInRange()))
-            {
-                delete (*it);
-                deletedObstecles.push_back(it);
-                numberOfObstecles--;
-            }
-        }
-
-        //remove dead obstecles
-        for(std::vector < std::vector<Obstecle *>::iterator >::iterator deleteIterator = deletedObstecles.begin(); deleteIterator != deletedObstecles.end(); deleteIterator++)
-        {
-            obstecles.erase(*deleteIterator);
         }
 
         // Draw the obstecles
@@ -531,29 +549,29 @@ int main( void )
     printf("main::main() terminating\n");
 
     // Cleanup VBO and shader
-    player->releaseResources();
-    for (std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
-    {
-        (*it)->releaseResources();
-    }
-    for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
-    {
-        (*it)->releaseResources();
-    }
-    for (std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
-    {
-        (*it)->releaseResources();
-    }
+    glDeleteBuffers(1, &O_vertexbuffer[0]);
+    glDeleteBuffers(1, &O_vertexbuffer[1]);
+    glDeleteBuffers(1, &O_vertexbuffer[2]);
+    glDeleteBuffers(1, &O_vertexbuffer[3]);
+    glDeleteBuffers(1, &O_vertexbuffer[4]);
+    glDeleteBuffers(1, &O_uvbuffer[0]);
+    glDeleteBuffers(1, &O_uvbuffer[1]);
+    glDeleteBuffers(1, &O_uvbuffer[2]);
+    glDeleteBuffers(1, &O_uvbuffer[3]);
+    glDeleteBuffers(1, &O_uvbuffer[4]);
+    glDeleteBuffers(1, &m_vertexbuffer);
+    glDeleteBuffers(1, &m_uvbuffer);
+    glDeleteBuffers(1, &b_vertexbuffer);
+    glDeleteBuffers(1, &p_uvbuffer);
+    glDeleteBuffers(1, &p_vertexbuffer);
     glDeleteProgram(programID);
-    player->releaseTexture();
-    for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
-    {
-        (*it)->releaseTexture();
-    }
-    for (std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
-    {
-        (*it)->releaseTexture();
-    }
+    glDeleteTextures(1, &O_Texture[0]);
+    glDeleteTextures(1, &O_Texture[1]);
+    glDeleteTextures(1, &O_Texture[2]);
+    glDeleteTextures(1, &O_Texture[3]);
+    glDeleteTextures(1, &O_Texture[4]);
+    glDeleteTextures(1, &m_Texture);
+    glDeleteTextures(1, &p_Texture);
 
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
@@ -562,15 +580,20 @@ int main( void )
     delete scene;
     delete player;
 
-    for (std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
-    {
-        delete (*it);
-    }
+    // delete the monsters
     for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
     {
         delete (*it);
     }
-    for (std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
+
+    // delete the bullets
+    for (std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
+    {
+        delete (*it);
+    }
+
+    // delete the obstecles
+    for(std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
     {
         delete (*it);
     }

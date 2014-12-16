@@ -17,9 +17,6 @@ public:
     //update the object state
     virtual void update(GLFWwindow* window);
 
-    //release handlers
-    virtual void releaseResources();
-
     //Checks collision with another GameObject
     virtual bool checkCollision(GameObject *);
 

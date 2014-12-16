@@ -100,13 +100,8 @@ void GameObject::setIDs(const GLuint &vertexPosition_modelspaceID, const GLuint 
     this->colorbuffer = colorbuffer;
 }
 
-// Delete texture ID
-void GameObject::releaseTexture()
-{
-    // We don't have one. Nothing to do here!
-}
-
+// Gets the collider of the object
 Collider GameObject::getCollider() const
 {
-return this->collider;
+    return this->collider;
 }

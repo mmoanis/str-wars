@@ -8,9 +8,10 @@ Obstecle::Obstecle(Lane lane, vec3 position): GameObject(lane, position, OBSTECL
     anglex = 0;
     anglez = 0;
     obsteclesCount++;
+    scalex = scaley = scalez = 0.02f;
     printf("Obstecle::Obstecle() created obstecle #%d at x=%d y=%d z=%d\n", obsteclesCount, (int)position.x, (int)position.y, (int)position.z);
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
-    ScalingMatrix = scale(mat4(), vec3(0.03f, 0.03f, 0.03f));
+    ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
     inRange = true;
 
 }
@@ -26,20 +27,6 @@ bool Obstecle::checkCollision(GameObject *)
     // TODO: implement collision detection
     return false;
 }
-// Release handlers IDs
-void Obstecle::releaseResources()
-{
-    //delete the handles
-    glDeleteBuffers(1, &vertexbuffer);
-    glDeleteBuffers(1, &uvbuffer);
-}
-
-// Release the textures
-void Obstecle::releaseTexture()
-{
-    //delete the handles
-    glDeleteTextures(1, &textureID);
-}
 
 // Initialize object state
 // @Deprecated: use constructor instead
@@ -50,7 +37,7 @@ void Obstecle::setup()
 void Obstecle::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
     //make the matrices for the transformation
-    TranslationMatrix = translate(mat4(), vec3((int)_position.x, 0.0f,(int)_position.z));
+    TranslationMatrix = translate(mat4(), vec3((int)_position.x, (int)_position.y,(int)_position.z));
 
     glm::mat4 Model = TranslationMatrix* RotationMatrix* ScalingMatrix;//order of multiplication is important (try different values above and different order of multiplication)
 
@@ -104,7 +91,7 @@ void Obstecle::update(GLFWwindow* window)
 {
     if (_position.z >= MAX_NEGATIVE_Z)
     {
-        _position.z-= 0.5;
+        _position.z-= 0.3;
         //printf("updated %d\n",(int) _position.z);
     }
     else
