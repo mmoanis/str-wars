@@ -5,7 +5,7 @@
 class Bullet : public GameObject
 {
 public:
-    Bullet(Lane lane, vec3 position);
+    Bullet(vec3 position);
     virtual ~Bullet();
 
     //especify how the object is drawn to the screen
@@ -15,10 +15,7 @@ public:
     virtual void setup();
 
     //update the object state
-    virtual void update(GLFWwindow* window);
-
-    //Checks collision with another GameObject
-    virtual bool checkCollision(GameObject *);
+    virtual bool update(GLFWwindow* window, std::vector<GameObject *> *);
 
     //check wether the bullet is still in screen
     bool isInRange() const;

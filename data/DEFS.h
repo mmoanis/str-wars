@@ -24,13 +24,9 @@ using namespace glm;
 ///
 struct Collider
 {
-
-};
-
-enum Lane {
-    LEFT,
-    CENTER,
-    RIGHT
+    float sizex;
+    float sizey;
+    float sizez;
 };
 
 enum GameObjectType {

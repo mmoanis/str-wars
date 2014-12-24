@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "DEFS.h"
+#include <math.h>
 
 // Include GLFW
 #include <glfw3.h>
@@ -12,7 +13,7 @@ using namespace glm;
 class GameObject
 {
 public:
-    GameObject(Lane lane, vec3 position, GameObjectType type);
+    GameObject(vec3 position, GameObjectType type);
     GameObject();
     virtual ~GameObject();
 
@@ -23,10 +24,10 @@ public:
     virtual void render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View) = 0;
 	
     //update the object state
-    virtual void update(GLFWwindow* window) = 0;
+    virtual bool update(GLFWwindow* window, std::vector<GameObject *> *) = 0;
 
     //Checks collision with another GameObject
-    virtual bool checkCollision(GameObject *) = 0;
+    virtual bool checkCollision(GameObject *);
 
     //virtual void makeSoundEffect() = 0;
 
@@ -38,9 +39,6 @@ public:
 
     //set the position of the object
     void setPosition(vec3);
-
-    //get the lane the object currently occupies
-    Lane getLane() const;
 
     //get the vertices of the object
     std::vector< glm::vec3 > getVertices() const;
@@ -64,9 +62,6 @@ public:
     //get the collider of the game object
     Collider getCollider() const;
 protected:
-    //define the lane which the object in
-    //@deprecicated
-    Lane _lane;
 
     //type of game object
     GameObjectType _objectType;

@@ -1,9 +1,8 @@
 #include "gameobject.h"
 
 // Constructor
-GameObject::GameObject(Lane lane, vec3 position, GameObjectType type)
+GameObject::GameObject(vec3 position, GameObjectType type)
 {
-    this->_lane = lane;
     this->_objectType = type;
     this->_position = position;
 }
@@ -39,10 +38,10 @@ void GameObject::setPosition(vec3 position)
     this->_position = position;
 }
 
-// Gets the lane which the object is in
-Lane GameObject::getLane() const
+// Checks collision with another game object
+bool GameObject::checkCollision(GameObject * other)
 {
-    return this->_lane;
+    return false;
 }
 
 // Gets the UVs matrix

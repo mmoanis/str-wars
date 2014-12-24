@@ -1,7 +1,7 @@
 #include "player.h"
 
 // Constructor
-Player::Player(Lane lane, vec3 position): GameObject(lane, position, PLAYER)
+Player::Player(vec3 position): GameObject(position, PLAYER)
 {
     printf("Player::Player() at x=%d y=%d z=%d\n", (int)position.x, (int)position.y, (int)position.z);
 
@@ -14,6 +14,16 @@ Player::Player(Lane lane, vec3 position): GameObject(lane, position, PLAYER)
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
     //ScalingMatrix = scale(mat4(), vec3(0.05f, 0.05f, 0.05f));
     ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
+
+
+    //scalez = 0.5;
+    //scalex = 0.60;
+    //scaley = 0.20;
+
+    // set the collider
+    this->collider.sizex = 0.6;
+    this->collider.sizey = 0.2;
+    this->collider.sizez = 0.5;
 }
 
 // Destructor
@@ -23,10 +33,15 @@ Player::~Player()
 }
 
 // Check collision with other objects
-bool Player::checkCollision(GameObject *)
+bool Player::checkCollision(GameObject * other)
 {
-    // TODO: implement collision detection
-    return false;
+    vec3 position = other ->getPosition();
+
+    bool x = abs(_position.x - position.x) < this->collider.sizex;
+    bool y = abs(_position.y - position.y) < this->collider.sizey;
+    bool z = abs(_position.z - position.z) < this->collider.sizez;
+
+    return x && y && z;
 }
 
 // Initialize object state
@@ -89,30 +104,30 @@ void Player::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &
 }
 
 // Update the player states
-void Player::update(GLFWwindow* window)
+bool Player::update(GLFWwindow* window, std::vector<GameObject *> *gameObjects)
 {
     //get user input
     if (glfwGetKey( window, GLFW_KEY_LEFT) == GLFW_PRESS ) //left arrow is pressed, so move the traingle left
     {
         if (_position.x < MAX_POSITIVE_X)
         {
-            _position.x++;
-            anglez += 0.1;
+            _position.x+=0.75;
+            anglez += 0.05;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_RIGHT) == GLFW_PRESS )
     {
         if ( _position.x > MAX_NEGATIVE_X )
         {
-            _position.x--;
-            anglez -= 0.1;
+            _position.x-=0.75;
+            anglez -= 0.05;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_W) == GLFW_PRESS )
     {
         if ( _position.z <= MAX_POSITIVE_Z )
         {
-            _position.z++;
+            _position.z+=0.75;
             if (anglex < 0.5)
                 anglex += 0.05;
         }
@@ -121,24 +136,36 @@ void Player::update(GLFWwindow* window)
     {
         if (_position.z >= MAX_NEGATIVE_Z)
         {
-            _position.z--;
+            _position.z-=0.75;
             if ( anglex > 0)
-                anglex -= 0.1;
+                anglex -= 0.05;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_UP) == GLFW_PRESS )
     {
         if ( _position.y <= MAX_POSITIVE_Y )
         {
-            _position.y++;
+            _position.y+=0.75;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_DOWN) == GLFW_PRESS )
     {
         if (_position.y >= MAX_NEGATIVE_Y)
         {
-            _position.y--;
+            _position.y-=0.75;
+        }
+    }
+
+    for (std::vector<GameObject *>::iterator it = gameObjects->begin(); it != gameObjects->end(); it++)
+    {
+        if (((*it)->getObjectType() == MONSTER || (*it)->getObjectType() == OBSTECL) && checkCollision((*it)))
+        {
+            vec3 pos = (*it)->getPosition();
+            printf("**** x:%d y:%d z:%d ***\n", (int)_position.x, (int)_position.y, (int)_position.z);
+            printf("-------------**** x:%d y:%d z:%d ***-------------\n", (int)pos.x, (int)pos.y, (int)pos.z);
+            return false;
         }
     }
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
+    return true;
 }

@@ -5,7 +5,7 @@
 class Monster : public GameObject
 {
 public:
-    Monster(Lane lane, vec3 position);
+    Monster(vec3 position);
     virtual ~Monster();
 
     // Setup and initialize object
@@ -15,7 +15,7 @@ public:
     virtual void render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View);
 
     // Update the object state
-    virtual void update(GLFWwindow* window);
+    virtual bool update(GLFWwindow* window, std::vector<GameObject *> *);
 
     // Checks collision with another GameObject
     virtual bool checkCollision(GameObject *);

@@ -2,30 +2,26 @@
 
 int Obstecle::obsteclesCount = 0;
 
-Obstecle::Obstecle(Lane lane, vec3 position): GameObject(lane, position, OBSTECL)
+Obstecle::Obstecle(vec3 position): GameObject(position, OBSTECL)
 {
     angley = 0;
     anglex = 0;
     anglez = 0;
     obsteclesCount++;
     scalex = scaley = scalez = 0.02f;
-    printf("Obstecle::Obstecle() created obstecle #%d at x=%d y=%d z=%d\n", obsteclesCount, (int)position.x, (int)position.y, (int)position.z);
+    //printf("Obstecle::Obstecle() created obstecle #%d at x=%d y=%d z=%d\n", obsteclesCount, (int)position.x, (int)position.y, (int)position.z);
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
     ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
     inRange = true;
 
+    // set the collider
+    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.50;
 }
 
 // Destructor
 Obstecle::~Obstecle()
 {
-    printf("Obstecle::~Obstecle() destructed\n");
-}
-
-bool Obstecle::checkCollision(GameObject *)
-{
-    // TODO: implement collision detection
-    return false;
+    //printf("Obstecle::~Obstecle() destructed\n");
 }
 
 // Initialize object state
@@ -87,7 +83,7 @@ void Obstecle::render(const GLuint &MatrixID, const mat4 &Projection, const mat4
 }
 
 // Update the obstecle state
-void Obstecle::update(GLFWwindow* window)
+bool Obstecle::update(GLFWwindow* window, std::vector<GameObject *> *)
 {
     if (_position.z >= MAX_NEGATIVE_Z)
     {
@@ -96,6 +92,8 @@ void Obstecle::update(GLFWwindow* window)
     }
     else
         inRange = false;    //mark dead
+
+    return true;
 }
 
 // Gets is in screen range

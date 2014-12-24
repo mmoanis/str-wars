@@ -1,11 +1,13 @@
-#ifndef OBSTECLE_H
-#define OBSTECLE_H
+/*#ifndef MENU_H
+#define MENU_H
+
 #include "gameobject.h"
-class Obstecle : public GameObject
-{
+
+class Menu : public GameObject {
+
 public:
-    Obstecle(vec3 position);
-    virtual ~Obstecle();
+    Menu(vec3 position);
+    virtual ~Player();
 
     // Setup and initialize object
     void setup();
@@ -16,12 +18,9 @@ public:
     // Update the object state
     virtual bool update(GLFWwindow* window, std::vector<GameObject *> *);
 
-    bool isInRange() const;
-
-private:
-    bool inRange;
-
-    static int obsteclesCount;
+    // Checks collision with another GameObject
+    virtual bool checkCollision(GameObject *);
 };
 
-#endif // OBSTECLE_H
+#endif
+*/

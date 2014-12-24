@@ -2,7 +2,7 @@
 
 int Monster::monsterCount = 0;
 
-Monster::Monster(Lane lane, vec3 position): GameObject(lane, position, PLAYER)
+Monster::Monster(vec3 position): GameObject(position, MONSTER)
 {
     monsterCount++;
     angley = 3.14;
@@ -13,6 +13,9 @@ Monster::Monster(Lane lane, vec3 position): GameObject(lane, position, PLAYER)
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
     ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
     inRange = true;
+
+    // set the collider
+    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.35;
 }
 
 // Destructor
@@ -21,9 +24,21 @@ Monster::~Monster()
     printf("Monster::~Monster() destructed monster #%d\n", monsterCount);
 }
 
-bool Monster::checkCollision(GameObject *)
+bool Monster::checkCollision(GameObject *other)
 {
-    // TODO: implement collision detection
+    //Collider collider = other ->getCollider();
+    vec3 position = other ->getPosition();
+
+    if ( (abs(_position.x - position.x)) <= this->collider.sizex)
+    {
+        if ( (abs(_position.y - position.y)) <= this->collider.sizey)
+        {
+            if ( (abs(_position.z - position.z)) <= this->collider.sizez)
+            {
+                return true;
+            }
+        }
+    }
     return false;
 }
 
@@ -86,15 +101,29 @@ void Monster::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 
 }
 
 // Update the player states
-void Monster::update(GLFWwindow* window)
+bool Monster::update(GLFWwindow*, std::vector<GameObject *> * gameObjects)
 {
     //get user input
     if (_position.z >= MAX_NEGATIVE_Z)
     {
-        _position.z--;
+        _position.z-= 0.5;
     }
     else
         inRange = false;
+
+    //printf("%d\n", gameObjects->size());
+    for (std::vector<GameObject *>::iterator it = gameObjects->begin(); it != gameObjects->end(); it++)
+    {
+        if ((*it)->getObjectType() == BULLET && checkCollision((*it)))
+        {
+            vec3 pos = (*it)->getPosition();
+            printf("**** x:%d y:%d z:%d ***\n", (int)_position.x, (int)_position.y, (int)_position.z);
+            printf("-------------**** %d x:%d y:%d z:%d ***-------------\n", (*it)->getObjectType(), (int)pos.x, (int)pos.y, (int)pos.z);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 // Checks if monster is in range
