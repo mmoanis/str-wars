@@ -9,7 +9,7 @@ Obstecle::Obstecle(vec3 position): GameObject(position, OBSTECL)
     anglez = 0;
     obsteclesCount++;
     scalex = scaley = scalez = 0.02f;
-    //printf("Obstecle::Obstecle() created obstecle #%d at x=%d y=%d z=%d\n", obsteclesCount, (int)position.x, (int)position.y, (int)position.z);
+    printf("Obstecle::Obstecle() created obstecle #%d at x=%d y=%d z=%d\n", obsteclesCount, (int)position.x, (int)position.y, (int)position.z);
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
     ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
     inRange = true;
@@ -21,7 +21,7 @@ Obstecle::Obstecle(vec3 position): GameObject(position, OBSTECL)
 // Destructor
 Obstecle::~Obstecle()
 {
-    //printf("Obstecle::~Obstecle() destructed\n");
+    printf("Obstecle::~Obstecle() destructed\n");
 }
 
 // Initialize object state
@@ -87,7 +87,7 @@ bool Obstecle::update(GLFWwindow* window, std::vector<GameObject *> *)
 {
     if (_position.z >= MAX_NEGATIVE_Z)
     {
-        _position.z-= 0.3;
+        _position.z-= 0.05;
         //printf("updated %d\n",(int) _position.z);
     }
     else

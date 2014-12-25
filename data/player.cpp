@@ -111,48 +111,48 @@ bool Player::update(GLFWwindow* window, std::vector<GameObject *> *gameObjects)
     {
         if (_position.x < MAX_POSITIVE_X)
         {
-            _position.x+=0.75;
-            anglez += 0.05;
+            _position.x+=0.3;
+            anglez += 0.005;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_RIGHT) == GLFW_PRESS )
     {
         if ( _position.x > MAX_NEGATIVE_X )
         {
-            _position.x-=0.75;
-            anglez -= 0.05;
+            _position.x-=0.3;
+            anglez -= 0.005;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_W) == GLFW_PRESS )
     {
         if ( _position.z <= MAX_POSITIVE_Z )
         {
-            _position.z+=0.75;
+            _position.z+=0.3;
             if (anglex < 0.5)
-                anglex += 0.05;
+                anglex += 0.005;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_S) == GLFW_PRESS )
     {
         if (_position.z >= MAX_NEGATIVE_Z)
         {
-            _position.z-=0.75;
+            _position.z-=0.3;
             if ( anglex > 0)
-                anglex -= 0.05;
+                anglex -= 0.005;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_UP) == GLFW_PRESS )
     {
         if ( _position.y <= MAX_POSITIVE_Y )
         {
-            _position.y+=0.75;
+            _position.y+=0.05;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_DOWN) == GLFW_PRESS )
     {
         if (_position.y >= MAX_NEGATIVE_Y)
         {
-            _position.y-=0.75;
+            _position.y-=0.05;
         }
     }
 

@@ -106,7 +106,7 @@ bool Monster::update(GLFWwindow*, std::vector<GameObject *> * gameObjects)
     //get user input
     if (_position.z >= MAX_NEGATIVE_Z)
     {
-        _position.z-= 0.5;
+        _position.z-= 0.09;
     }
     else
         inRange = false;

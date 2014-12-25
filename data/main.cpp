@@ -338,6 +338,11 @@ int main( void )
     // Initialize our little text library with the Holstein font
     initText2D( "Holstein.DDS" );
 
+    double xpos, ypos;
+    char text[256];
+
+    char text1[256];
+
     //
     // The Game menu ends
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -355,6 +360,7 @@ int main( void )
     float distance = 0; //distance covered by player
     bool running = true;
     bool gameStarted = false;
+    bool cursor = true;
 
     std::vector < std::vector<Obstecle* >::iterator > deletedObstecles;
     std::vector < std::vector<Bullet* >::iterator > deletedBullets;
@@ -370,6 +376,8 @@ int main( void )
         // Use our shader
         glUseProgram(programID);
 
+
+
         if (gameStarted)
         {
 
@@ -378,8 +386,11 @@ int main( void )
 
             ///  -----------------------------------------* Update gameobjects state *---------------------------------
             //get user action and execute it
-            if (deltaTime >= 3.0f)
+            if (deltaTime >= 1.0f)
             {
+                deltaTime-= 1.0f;
+                bulletUpdates++;
+
                 // update bullets
                 for (std::vector<Bullet *> ::iterator it = bullets.begin(); it != bullets.end(); it++)
                 {
@@ -403,9 +414,6 @@ int main( void )
                     running = false;
                     while(1);
                 }
-
-                deltaTime-= 3.0f;
-                bulletUpdates++;
 
                 // update bullets
                 for (std::vector<Bullet *> ::iterator it = bullets.begin(); it != bullets.end(); it++)
@@ -500,9 +508,9 @@ int main( void )
                 /// add new objects
                 ///
                 // check to add new monster and player
-                if (bulletUpdates >= 5)
+                if (bulletUpdates >= 20)
                 {
-                    bulletUpdates -= 5;
+                    bulletUpdates -= 20;
 
                     if (glfwGetKey( window, GLFW_KEY_SPACE) == GLFW_PRESS )
                     {
@@ -531,7 +539,7 @@ int main( void )
 
                 obsteclesUpdate++;
 
-                if (obsteclesUpdate > 10)
+                if (obsteclesUpdate > 80)
                 {
                     ///TODO: fix the y-axis random number
                     posx = (rand() % (MAX_POSITIVE_X * 2)) - MAX_POSITIVE_X;
@@ -548,7 +556,7 @@ int main( void )
 
                     numberOfObstecles ++;
 
-                    obsteclesUpdate -= 10;
+                    obsteclesUpdate -= 80;
                 }
 
                 ///  -----------------------------------------* Rendering *-----------------------------------------
@@ -580,14 +588,36 @@ int main( void )
         else
         {
             // game menu
-            char text[256];
-            sprintf(text,"start game" );
-            printText2D(text, 50, 500, 60);
-
-            char text1[256];
+            if (cursor)
+            {
+                sprintf(text,">start game" );
             sprintf(text1,"exit" );
+            }
+            else
+            {
+                sprintf(text,"start game" );
+            sprintf(text1,">exit" );
+            }
+
+            if (glfwGetKey( window, GLFW_KEY_UP) == GLFW_PRESS )
+                {
+                    cursor = true;
+                }
+                else if (glfwGetKey( window, GLFW_KEY_DOWN) == GLFW_PRESS )
+                {
+                    cursor = false;
+                }
+            else if (glfwGetKey( window, GLFW_KEY_ENTER) == GLFW_PRESS )
+            {
+                running = gameStarted = cursor;
+                // Delete the text's VBO, the shader and the texture
+                cleanupText2D();
+            }
+
+            printText2D(text, 50, 500, 60);
             printText2D(text1, 60, 100, 60);
         }
+
         // Swap buffers
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -625,8 +655,7 @@ int main( void )
     glDeleteTextures(1, &m_Texture);
     glDeleteTextures(1, &p_Texture);
 
-    // Delete the text's VBO, the shader and the texture
-    cleanupText2D();
+
 
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
@@ -657,3 +686,4 @@ int main( void )
 
     return 0;
 }
+
