@@ -15,7 +15,7 @@ Obstecle::Obstecle(vec3 position): GameObject(position, OBSTECL)
     inRange = true;
 
     // set the collider
-    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.50;
+    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.50f;
 }
 
 // Destructor
@@ -87,8 +87,8 @@ bool Obstecle::update(GLFWwindow* window, std::vector<GameObject *> *)
 {
     if (_position.z >= MAX_NEGATIVE_Z)
     {
-        _position.z-= 0.05;
-        //printf("updated %d\n",(int) _position.z);
+        _position.z-= 0.05f;
+        printf("updated %f\n",(float) _position.z);
     }
     else
         inRange = false;    //mark dead

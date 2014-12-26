@@ -81,7 +81,7 @@ bool Bullet::update(GLFWwindow*, std::vector<GameObject *> *)
 {
     //update bullet position
     if (_position.z < BULLET_BARRIER)
-        _position.z++;
+        _position.z+=0.2f;
     else
         inRange = false;    //mark dead
 

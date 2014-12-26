@@ -6,10 +6,10 @@ Player::Player(vec3 position): GameObject(position, PLAYER)
     printf("Player::Player() at x=%d y=%d z=%d\n", (int)position.x, (int)position.y, (int)position.z);
 
     _health = 100;
-    anglex = 0.0;
+    anglex = 0.0f;
     anglez = 0;
-    angley = 3.14;
-    scalex = scaley = scalez = 0.002;
+    angley = 3.14f;
+    scalex = scaley = scalez = 0.002f;
 
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
     //ScalingMatrix = scale(mat4(), vec3(0.05f, 0.05f, 0.05f));
@@ -21,9 +21,11 @@ Player::Player(vec3 position): GameObject(position, PLAYER)
     //scaley = 0.20;
 
     // set the collider
-    this->collider.sizex = 0.6;
-    this->collider.sizey = 0.2;
-    this->collider.sizez = 0.5;
+    this->collider.sizex = 0.65f;
+    this->collider.sizey = 0.25f;
+    this->collider.sizez = 0.55f
+
+            ;
 }
 
 // Destructor
@@ -36,10 +38,12 @@ Player::~Player()
 bool Player::checkCollision(GameObject * other)
 {
     vec3 position = other ->getPosition();
-
-    bool x = abs(_position.x - position.x) < this->collider.sizex;
-    bool y = abs(_position.y - position.y) < this->collider.sizey;
-    bool z = abs(_position.z - position.z) < this->collider.sizez;
+    printf("\n%f %f %f\n", (float)_position.x, (float)position.x, (float)collider.sizex);
+    printf("%f %f %f\n", (float)_position.y, (float)position.y, (float)collider.sizey);
+    printf("%f %f %f\n", (float)_position.z, (float)position.z, (float)collider.sizez);
+    bool x = int (abs(_position.x - position.x) * 100) < (int) (this->collider.sizex * 100);
+    bool y = int (abs(_position.y - position.y) * 100) < int (this->collider.sizey * 100);
+    bool z = int (abs(_position.z - position.z) * 100) < int (this->collider.sizez * 100);
 
     return x && y && z;
 }
@@ -111,48 +115,48 @@ bool Player::update(GLFWwindow* window, std::vector<GameObject *> *gameObjects)
     {
         if (_position.x < MAX_POSITIVE_X)
         {
-            _position.x+=0.3;
-            anglez += 0.005;
+            _position.x+=0.3f;
+            anglez += 0.005f;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_RIGHT) == GLFW_PRESS )
     {
         if ( _position.x > MAX_NEGATIVE_X )
         {
-            _position.x-=0.3;
-            anglez -= 0.005;
+            _position.x-=0.3f;
+            anglez -= 0.005f;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_W) == GLFW_PRESS )
     {
         if ( _position.z <= MAX_POSITIVE_Z )
         {
-            _position.z+=0.3;
-            if (anglex < 0.5)
-                anglex += 0.005;
+            _position.z+=0.3f;
+            if (anglex < 0.5f)
+                anglex += 0.005f;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_S) == GLFW_PRESS )
     {
         if (_position.z >= MAX_NEGATIVE_Z)
         {
-            _position.z-=0.3;
+            _position.z-=0.3f;
             if ( anglex > 0)
-                anglex -= 0.005;
+                anglex -= 0.005f;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_UP) == GLFW_PRESS )
     {
         if ( _position.y <= MAX_POSITIVE_Y )
         {
-            _position.y+=0.05;
+            _position.y+=0.05f;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_DOWN) == GLFW_PRESS )
     {
         if (_position.y >= MAX_NEGATIVE_Y)
         {
-            _position.y-=0.05;
+            _position.y-=0.05f;
         }
     }
 

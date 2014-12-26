@@ -94,7 +94,7 @@ int main( void )
     glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
     // Camera matrix
     glm::mat4 View       = glm::lookAt(
-                 glm::vec3(0,2,-5), //position
+                 glm::vec3(0, 1,-10), //position
                  glm::vec3(0,0,0), // and looks at the origin
                  glm::vec3(0,1,0)  // Head is up
                  );
@@ -376,7 +376,7 @@ int main( void )
         // Use our shader
         glUseProgram(programID);
 
-
+        scene->render(MatrixID, Projection, View);
 
         if (gameStarted)
         {
@@ -386,9 +386,9 @@ int main( void )
 
             ///  -----------------------------------------* Update gameobjects state *---------------------------------
             //get user action and execute it
-            if (deltaTime >= 1.0f)
+            if (deltaTime >= 0.5f)
             {
-                deltaTime-= 1.0f;
+                deltaTime-= 0.5f;
                 bulletUpdates++;
 
                 // update bullets
@@ -545,7 +545,7 @@ int main( void )
                     posx = (rand() % (MAX_POSITIVE_X * 2)) - MAX_POSITIVE_X;
                     posy = (rand() % ((MAX_POSITIVE_Y+2) *2)) - MAX_POSITIVE_Y-2;
                     int i = rand() % 5;
-                    Obstecle *obstecle = new Obstecle(vec3(posx, posy, 40));
+                    Obstecle *obstecle = new Obstecle(vec3(posx, posy, 20));
                     obstecle->setIDs(O_vertexPosition_modelspaceID, O_vertexUVID, O_uvbuffer[i], O_vertexbuffer[i], 0, 0);
                     obstecle->setNormals(O_normals[i]);
                     obstecle->setTexture(O_TextureID, O_Texture[rand() % 5]);
@@ -561,9 +561,11 @@ int main( void )
 
                 ///  -----------------------------------------* Rendering *-----------------------------------------
 
+                //sprintf(text1,"score:" );
+                //printText2D(text1, 60, 500, 60);
+
                 // Draw the objects
                 player->render(MatrixID, Projection, View);
-                scene->render(MatrixID, Projection, View);
 
                 // Draw the monsters
                 for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
@@ -582,6 +584,8 @@ int main( void )
                 {
                     (*it)->render(MatrixID, Projection, View);
                 }
+
+
             }
 
         }

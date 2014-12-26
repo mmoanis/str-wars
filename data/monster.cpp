@@ -5,17 +5,17 @@ int Monster::monsterCount = 0;
 Monster::Monster(vec3 position): GameObject(position, MONSTER)
 {
     monsterCount++;
-    angley = 3.14;
+    angley = 3.14f;
     anglex = 0;
     anglez = 0;
-    scalex = scaley = scalez = 0.02;
+    scalex = scaley = scalez = 0.02f;
     printf("Monster::Monster() created monster #%d at x=%d y=%d z=%d\n", monsterCount, (int)position.x, (int)position.y, (int)position.z);
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
     ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
     inRange = true;
 
     // set the collider
-    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.35;
+    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.35f;
 }
 
 // Destructor
@@ -106,7 +106,8 @@ bool Monster::update(GLFWwindow*, std::vector<GameObject *> * gameObjects)
     //get user input
     if (_position.z >= MAX_NEGATIVE_Z)
     {
-        _position.z-= 0.09;
+        _position.z-= 0.09f;
+        printf("updated %f\n",(float) _position.z);
     }
     else
         inRange = false;
