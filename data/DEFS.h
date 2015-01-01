@@ -11,13 +11,14 @@ using namespace glm;
 
 //global definations
 #define MAX_POSITIVE_X 5
-#define MAX_POSITIVE_Y 1
+#define MAX_POSITIVE_Y 2
 #define MAX_POSITIVE_Z 5
 #define MAX_NEGATIVE_X -5
-#define MAX_NEGATIVE_Y -2
-#define MAX_NEGATIVE_Z -7
+#define MAX_NEGATIVE_Y -3
+#define MAX_NEGATIVE_Z -4
 #define BULLET_BARRIER 10
-#define UPDATES_PER_SECOND 60
+#define UPDATES_PER_SECOND 30
+
 
 ///
 /// \Defines the bounderies of the collider, used in collision detection
@@ -34,7 +35,8 @@ enum GameObjectType {
     MONSTER,
     OBSTECL,
     BULLET,
-    SCENE
+    SCENE,
+    EXPLODE
 };
 
 #endif // DEFS_H

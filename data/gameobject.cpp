@@ -7,13 +7,6 @@ GameObject::GameObject(vec3 position, GameObjectType type)
     this->_position = position;
 }
 
-// Default Constructor
-// @Deprecated
-GameObject::GameObject()
-{
-
-}
-
 // Virtual Destructor
 GameObject::~GameObject()
 {
@@ -30,6 +23,17 @@ GameObjectType GameObject::getObjectType() const
 vec3 GameObject::getPosition() const
 {
     return _position;
+}
+
+bool GameObject::update(GLFWwindow *window, std::list<GameObject *> *)
+{
+    return true;
+}
+
+// Gets is in screen range
+bool GameObject::isInRange() const
+{
+    return inRange;
 }
 
 // Sets the position of object

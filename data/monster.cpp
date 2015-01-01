@@ -42,11 +42,6 @@ bool Monster::checkCollision(GameObject *other)
     return false;
 }
 
-// Initialize object state
-// @Deprecated: use constructor instead
-void Monster::setup()
-{
-}
 // Draws the Monster on the screen
 void Monster::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
@@ -101,7 +96,7 @@ void Monster::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 
 }
 
 // Update the player states
-bool Monster::update(GLFWwindow*, std::vector<GameObject *> * gameObjects)
+bool Monster::update(GLFWwindow*, std::list<GameObject *> * gameObjects)
 {
     //get user input
     if (_position.z >= MAX_NEGATIVE_Z)
@@ -113,7 +108,7 @@ bool Monster::update(GLFWwindow*, std::vector<GameObject *> * gameObjects)
         inRange = false;
 
     //printf("%d\n", gameObjects->size());
-    for (std::vector<GameObject *>::iterator it = gameObjects->begin(); it != gameObjects->end(); it++)
+    for (std::list<GameObject *>::iterator it = gameObjects->begin(); it != gameObjects->end(); it++)
     {
         if ((*it)->getObjectType() == BULLET && checkCollision((*it)))
         {
@@ -125,10 +120,4 @@ bool Monster::update(GLFWwindow*, std::vector<GameObject *> * gameObjects)
     }
 
     return true;
-}
-
-// Checks if monster is in range
-bool Monster::isInRange() const
-{
-    return this->inRange;
 }

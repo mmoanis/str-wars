@@ -24,11 +24,6 @@ Obstecle::~Obstecle()
     printf("Obstecle::~Obstecle() destructed\n");
 }
 
-// Initialize object state
-// @Deprecated: use constructor instead
-void Obstecle::setup()
-{
-}
 // Draws the Monster on the screen
 void Obstecle::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
@@ -83,21 +78,15 @@ void Obstecle::render(const GLuint &MatrixID, const mat4 &Projection, const mat4
 }
 
 // Update the obstecle state
-bool Obstecle::update(GLFWwindow* window, std::vector<GameObject *> *)
+bool Obstecle::update(GLFWwindow*, std::list<GameObject *> *)
 {
     if (_position.z >= MAX_NEGATIVE_Z)
     {
-        _position.z-= 0.05f;
-        printf("updated %f\n",(float) _position.z);
+        _position.z-= 0.15f;
+        //printf("updated %f\n",(float) _position.z);
     }
     else
         inRange = false;    //mark dead
 
     return true;
-}
-
-// Gets is in screen range
-bool Obstecle::isInRange() const
-{
-    return inRange;
 }

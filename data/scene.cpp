@@ -89,15 +89,58 @@ Scene::Scene()
     glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
 
-    x = 0;
+    anglex = angley = levelCount = 0;
+}
+
+void Scene::reset()
+{
+    anglex = angley = levelCount = 0;
+}
+
+//
+void Scene::update()
+{
+    switch (levelCount) {
+    case 0:
+        anglex = 3.14/2;
+        break;
+    case 1:
+        anglex = -3.14/2;
+        break;
+    case 2:
+        angley = 3.14/2;
+        anglex = 0;
+        break;
+    case 4:
+        angley = -3.14/2;
+        break;
+    case 5:
+        angley = 3.14;
+        break;
+    case 6:
+        angley = -3.14;
+        break;
+    case 7:
+        anglex = 3.14;
+        angley = 0;
+        break;
+    case 8:
+        anglex = -3.14;
+        levelCount = -1;
+        break;
+    default:
+        break;
+    }
+
+    levelCount++;
 }
 
 void Scene :: render(const GLuint MatrixID, const mat4 Projection, const mat4 View)
 {
     glm::mat4 ScalingMatrix = scale(mat4(), vec3(30.0f,30.0f,30.0f));
     glm::mat4   TranslationMatrix = translate(mat4(), vec3(0.0f, 0.0f,50.0f));
-    //glm::mat4 RotationMatrix = eulerAngleYXZ(0.0f, x, 0.0f);
-    MVP = Projection * View*TranslationMatrix*ScalingMatrix  ;
+    glm::mat4 RotationMatrix = eulerAngleYXZ(angley, anglex, 0.0f);
+    MVP = Projection * View*TranslationMatrix*RotationMatrix*ScalingMatrix  ;
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
     // Bind our texture in Texture Unit 0

@@ -18,12 +18,22 @@ using namespace glm;
 
 #include <glm/gtx/euler_angles.hpp>//rotation
 #include <glm/gtx/norm.hpp>//rotation
+
+///
+/// \brief The Scene class holds the context of the game scene.
+///
 class Scene
 {
 public:
     Scene();
     inline  ~Scene(){}
     void render(const GLuint MatrixID, const mat4 Projection, const mat4 View);
+
+    // Update the scene according to the level.
+    void update();
+
+    // Reset the scene to the default.
+    void reset();
 
     //
     glm::mat4 MVP;
@@ -37,7 +47,10 @@ public:
     GLuint ModelMatrixID ;
     GLuint vertexbuffer;
     GLuint uvbuffer;
-    float x;
+    float anglex;
+    float angley;
+
+    int levelCount;
 
 };
 

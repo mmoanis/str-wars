@@ -9,6 +9,7 @@ Player::Player(vec3 position): GameObject(position, PLAYER)
     anglex = 0.0f;
     anglez = 0;
     angley = 3.14f;
+    inRange = true;
     scalex = scaley = scalez = 0.002f;
 
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
@@ -38,20 +39,14 @@ Player::~Player()
 bool Player::checkCollision(GameObject * other)
 {
     vec3 position = other ->getPosition();
-    printf("\n%f %f %f\n", (float)_position.x, (float)position.x, (float)collider.sizex);
-    printf("%f %f %f\n", (float)_position.y, (float)position.y, (float)collider.sizey);
-    printf("%f %f %f\n", (float)_position.z, (float)position.z, (float)collider.sizez);
+    //printf("\n%f %f %f\n", (float)_position.x, (float)position.x, (float)collider.sizex);
+    //printf("%f %f %f\n", (float)_position.y, (float)position.y, (float)collider.sizey);
+    //printf("%f %f %f\n", (float)_position.z, (float)position.z, (float)collider.sizez);
     bool x = int (abs(_position.x - position.x) * 100) < (int) (this->collider.sizex * 100);
     bool y = int (abs(_position.y - position.y) * 100) < int (this->collider.sizey * 100);
     bool z = int (abs(_position.z - position.z) * 100) < int (this->collider.sizez * 100);
 
     return x && y && z;
-}
-
-// Initialize object state
-// @Deprecated: use constructor instead
-void Player::setup()
-{
 }
 
 // Draws the player on the screen
@@ -108,7 +103,7 @@ void Player::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &
 }
 
 // Update the player states
-bool Player::update(GLFWwindow* window, std::vector<GameObject *> *gameObjects)
+bool Player::update(GLFWwindow* window, std::list<GameObject *> *gameObjects)
 {
     //get user input
     if (glfwGetKey( window, GLFW_KEY_LEFT) == GLFW_PRESS ) //left arrow is pressed, so move the traingle left
@@ -149,18 +144,18 @@ bool Player::update(GLFWwindow* window, std::vector<GameObject *> *gameObjects)
     {
         if ( _position.y <= MAX_POSITIVE_Y )
         {
-            _position.y+=0.05f;
+            _position.y+=0.3f;
         }
     }
     else if (glfwGetKey( window, GLFW_KEY_DOWN) == GLFW_PRESS )
     {
         if (_position.y >= MAX_NEGATIVE_Y)
         {
-            _position.y-=0.05f;
+            _position.y-=0.3f;
         }
     }
 
-    for (std::vector<GameObject *>::iterator it = gameObjects->begin(); it != gameObjects->end(); it++)
+    for (std::list<GameObject *>::iterator it = gameObjects->begin(); it != gameObjects->end(); it++)
     {
         if (((*it)->getObjectType() == MONSTER || (*it)->getObjectType() == OBSTECL) && checkCollision((*it)))
         {

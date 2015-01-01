@@ -1,9 +1,10 @@
 // Include standard headers
 #include <stdio.h>
 #include <stdlib.h>
+#include <list>
 #include <vector>
 #include <math.h>
-#include <memory>
+#include <algorithm>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -19,7 +20,6 @@ using namespace glm;
 
 #include <common/shader.hpp>
 #include <common/texture.hpp>
-#include <common/controls.hpp>
 #include <common/objloader.hpp>
 #include <common/text2D.hpp>
 
@@ -28,6 +28,21 @@ using namespace glm;
 #include "scene.h"
 #include "monster.h"
 #include "obstecle.h"
+#include "explosion.h"
+#include "level.h"
+
+Scene * scene;
+Player * player;
+Explode * explosion;
+
+std::list < std::list<GameObject* >::iterator > deletedObjects;
+std::list < GameObject * > objects;
+
+
+void removeUnessaryObjects(bool clear);
+
+void delay(int milli);
+
 
 ///
 /// Holds the main context of the game
@@ -107,7 +122,9 @@ int main( void )
     // The Scene
     printf("main::main() making scene\n");
 
-    Scene * scene = new Scene();
+    // define our scene
+    scene = new Scene();
+
     GLuint vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
     GLuint vertexUVID = glGetAttribLocation(programID, "vertexUV");
    // Load the texture
@@ -125,11 +142,27 @@ int main( void )
     // /////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // /////////////////////////////////////////////////////////////////////////////////////////////////
+    // The levels
+
+    LevelLoader levelLoader;
+
+    if (!levelLoader.loadLevels())
+    {
+        printf("failed to load levels\n");
+        glfwTerminate();
+        return -1;
+    }
+
+    //
+    // The levels ends
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
     // The player
     printf("main::main(): making player\n");
 
     // Define our player
-    Player * player = new Player(vec3(0, 0, 0));
+    player = new Player(vec3(0, 0, 0));
 
     // Get a handle for our buffers
     GLuint p_vertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
@@ -218,8 +251,6 @@ int main( void )
     glBindBuffer(GL_ARRAY_BUFFER, b_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-    std::vector<Bullet *> bullets;
-
     //
     // The bullets ends
     // /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -253,8 +284,6 @@ int main( void )
     glGenBuffers(1, &m_uvbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
     glBufferData(GL_ARRAY_BUFFER, m_uvs.size() * sizeof(glm::vec2), &m_uvs[0], GL_STATIC_DRAW);
-
-    std::vector<Monster *> monsters;
 
     //
     // The monster ends
@@ -326,22 +355,132 @@ int main( void )
     glBindBuffer(GL_ARRAY_BUFFER, O_uvbuffer[4]);
     glBufferData(GL_ARRAY_BUFFER, (O_uvs[4]).size() * sizeof(glm::vec2), &O_uvs[4][0], GL_STATIC_DRAW);
 
-    std::vector<Obstecle *> obstecles;
-
     //
     // The Obstecles ends
     // /////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
+    // The explosion begins
+
+    static const GLfloat e_vertex_buffer_data[] = {
+            -1.0f,-1.0f,-1.0f,
+            -1.0f,-1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+             1.0f, 1.0f,-1.0f,
+            -1.0f,-1.0f,-1.0f,
+            -1.0f, 1.0f,-1.0f,
+             1.0f,-1.0f, 1.0f,
+            -1.0f,-1.0f,-1.0f,
+             1.0f,-1.0f,-1.0f,
+             1.0f, 1.0f,-1.0f,
+             1.0f,-1.0f,-1.0f,
+            -1.0f,-1.0f,-1.0f,
+            -1.0f,-1.0f,-1.0f,
+            -1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f,-1.0f,
+             1.0f,-1.0f, 1.0f,
+            -1.0f,-1.0f, 1.0f,
+            -1.0f,-1.0f,-1.0f,
+            -1.0f, 1.0f, 1.0f,
+            -1.0f,-1.0f, 1.0f,
+             1.0f,-1.0f, 1.0f,
+             1.0f, 1.0f, 1.0f,
+             1.0f,-1.0f,-1.0f,
+             1.0f, 1.0f,-1.0f,
+             1.0f,-1.0f,-1.0f,
+             1.0f, 1.0f, 1.0f,
+             1.0f,-1.0f, 1.0f,
+             1.0f, 1.0f, 1.0f,
+             1.0f, 1.0f,-1.0f,
+            -1.0f, 1.0f,-1.0f,
+             1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f,-1.0f,
+            -1.0f, 1.0f, 1.0f,
+             1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+             1.0f,-1.0f, 1.0f
+    };
+
+    // Two UV coordinatesfor each vertex. They were created with Blender.
+    static const GLfloat e_uv_buffer_data[] = {
+        0.000059f, 1.0f-0.000004f,
+        0.000103f, 1.0f-0.336048f,
+        0.335973f, 1.0f-0.335903f,
+        1.000023f, 1.0f-0.000013f,
+        0.667979f, 1.0f-0.335851f,
+        0.999958f, 1.0f-0.336064f,
+        0.667979f, 1.0f-0.335851f,
+        0.336024f, 1.0f-0.671877f,
+        0.667969f, 1.0f-0.671889f,
+        1.000023f, 1.0f-0.000013f,
+        0.668104f, 1.0f-0.000013f,
+        0.667979f, 1.0f-0.335851f,
+        0.000059f, 1.0f-0.000004f,
+        0.335973f, 1.0f-0.335903f,
+        0.336098f, 1.0f-0.000071f,
+        0.667979f, 1.0f-0.335851f,
+        0.335973f, 1.0f-0.335903f,
+        0.336024f, 1.0f-0.671877f,
+        1.000004f, 1.0f-0.671847f,
+        0.999958f, 1.0f-0.336064f,
+        0.667979f, 1.0f-0.335851f,
+        0.668104f, 1.0f-0.000013f,
+        0.335973f, 1.0f-0.335903f,
+        0.667979f, 1.0f-0.335851f,
+        0.335973f, 1.0f-0.335903f,
+        0.668104f, 1.0f-0.000013f,
+        0.336098f, 1.0f-0.000071f,
+        0.000103f, 1.0f-0.336048f,
+        0.000004f, 1.0f-0.671870f,
+        0.336024f, 1.0f-0.671877f,
+        0.000103f, 1.0f-0.336048f,
+        0.336024f, 1.0f-0.671877f,
+        0.335973f, 1.0f-0.335903f,
+        0.667969f, 1.0f-0.671889f,
+        1.000004f, 1.0f-0.671847f,
+        0.667979f, 1.0f-0.335851f
+    };
+
+    // define our explosion
+    explosion = new Explode();
+
+    GLuint evertexPosition_modelspaceID = glGetAttribLocation(programID, "vertexPosition_modelspace");
+    GLuint evertexUVID = glGetAttribLocation(programID, "vertexUV");
+    // Load the texture
+    GLuint eTexture = loadBMP_custom("skull2.bmp");
+
+    // Get a handle for our "myTextureSampler" uniform
+    GLuint eTexID  = glGetUniformLocation(programID, "myTextureSampler");
+    GLuint e_vertexbuffer, e_uvbuffer;
+    glGenBuffers(1, &e_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, e_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(e_vertex_buffer_data), e_vertex_buffer_data, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &e_uvbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, e_uvbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(e_uv_buffer_data), e_uv_buffer_data, GL_STATIC_DRAW);
+
+    explosion->setIDs(evertexPosition_modelspaceID, evertexUVID, e_uvbuffer, e_vertexbuffer, 0, 0);
+    explosion->setTexture(eTexID, eTexture);
+
+    //
+    // The explosion ends
+    // /////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     // /////////////////////////////////////////////////////////////////////////////////////////////////
     // The Game menu
 
     // Initialize our little text library with the Holstein font
     initText2D( "Holstein.DDS" );
-
-    double xpos, ypos;
     char text[256];
-
     char text1[256];
+    char text2[256];
+    char text3[256];
+    sprintf(text,"start game" );
+    sprintf(text1,">exit" );
+    sprintf(text2,">start game" );
+    sprintf(text3,"exit" );
 
     //
     // The Game menu ends
@@ -353,273 +492,208 @@ int main( void )
 
     double lastTime = glfwGetTime(), deltaTime=0.0f;
     int bulletUpdates = 0;
-    bool addMonster = true;
     float posx, posy, posz=20;
-    int numberOfObstecles = 2;
     float obsteclesUpdate = 0;
     float distance = 0; //distance covered by player
     bool running = true;
     bool gameStarted = false;
     bool cursor = true;
+    int deathTime = 0;
+    bool collision = false;
+    int monsterUpdate = 0;
+    Level currentLevel;
+    levelLoader.getCurrentLevel(currentLevel);
 
-    std::vector < std::vector<Obstecle* >::iterator > deletedObstecles;
-    std::vector < std::vector<Bullet* >::iterator > deletedBullets;
-    std::vector < std::vector<Monster* >::iterator > deletedMonsters;
 
-    std::vector < GameObject * > * gameObjects = new std::vector < GameObject * > ();
+    //printf("%d\n", (int)currentLevel.obstcales);
 
     do{
-
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Use our shader
         glUseProgram(programID);
 
+        // render the scene
         scene->render(MatrixID, Projection, View);
 
+        // game loop
         if (gameStarted)
         {
-
+            // update frame time
             deltaTime += (glfwGetTime() - lastTime) *  UPDATES_PER_SECOND;
             lastTime = glfwGetTime();
 
-            ///  -----------------------------------------* Update gameobjects state *---------------------------------
-            //get user action and execute it
-            if (deltaTime >= 0.5f)
+            if (collision)
             {
-                deltaTime-= 0.5f;
-                bulletUpdates++;
+                // render the death frame
+                explosion->render(MatrixID, Projection, View);
 
-                // update bullets
-                for (std::vector<Bullet *> ::iterator it = bullets.begin(); it != bullets.end(); it++)
+                if (deltaTime >= 0.5f)
                 {
-                    gameObjects->push_back((GameObject *) (*it));
-                }
+                    deltaTime -= 0.5f;
 
-                // update monsters
-                for (std::vector<Monster*>::iterator it = monsters.begin(); it != monsters.end(); it++)
-                {
-                    gameObjects->push_back((GameObject *) (*it));
-                }
+                    deathTime++;
 
-                // update obstecles
-                for (std::vector<Obstecle*>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
-                {
-                    gameObjects->push_back((GameObject *) (*it));
-                }
-
-                if (! (player->update(window, gameObjects)))
-                {
-                    running = false;
-                    while(1);
-                }
-
-                // update bullets
-                for (std::vector<Bullet *> ::iterator it = bullets.begin(); it != bullets.end(); it++)
-                {
-                    (*it)->update(window, NULL);
-                }
-
-                // update monsters
-                for (std::vector<Monster*>::iterator it = monsters.begin(); it != monsters.end(); it++)
-                {
-                    if (! ((*it)->update(window, gameObjects)) )
+                    if (deathTime > 50)
                     {
-                        deletedMonsters.push_back(it);
-                        addMonster = true;
+                        collision = false;
+                        deathTime = 0;
                     }
                 }
-
-                // update obstecles
-                for (std::vector<Obstecle*>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
+            }
+            else
+            {
+                // update distance
+                distance += 0.5;
+                //printf("distance covered: %d next level at %d\n", (int)distance, (int)currentLevel.distance);
+                if (distance > currentLevel.distance)
                 {
-                    (*it)->update(window, gameObjects);
-                }
-
-                gameObjects->clear();
-
-                /// removing dead* objects
-                ///
-                ///
-                ///
-
-
-                //check for dead bullets
-                for(std::vector<Bullet* >::iterator it = bullets.begin(); it != bullets.end(); it++)
-                {
-                    if (!((*it)->isInRange()))
+                    if (levelLoader.getCurrentLevel(currentLevel))
                     {
-                        deletedBullets.push_back(it);
-                    }
-                }
-
-                //check for dead monsters
-                for(std::vector<Monster* >::iterator it = monsters.begin(); it != monsters.end(); it++)
-                {
-                    if (!((*it)->isInRange()))
-                    {
-                        deletedMonsters.push_back(it);
-                        addMonster = true;
+                        // start from begining
+                        scene->update();
+                        printf("level%d\n", (int) currentLevel.level);
                     }
                     else
-                        addMonster = false;
-                }
-
-                //check for dead obstecles
-                for(std::vector<Obstecle*>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
-                {
-                    if (!((*it)->isInRange()))
                     {
-                        deletedObstecles.push_back(it);
-                        numberOfObstecles--;
+                        running = false;
                     }
                 }
 
-                //remove dead bullets
-                for(std::vector < std::vector<Bullet* >::iterator >::iterator deleteIterator = deletedBullets.begin(); deleteIterator != deletedBullets.end(); deleteIterator++)
+                ///  -----------------------------------------* Update gameobjects state *---------------------------------
+                //get user action and execute it
+                if (deltaTime >= 0.5f)
                 {
-                    Bullet * bullet = **deleteIterator;
-                    bullets.erase(*deleteIterator);
-                    delete bullet;
-                }
+                    deltaTime-= 0.5f;
 
-                //remove dead monsters
-                for(std::vector < std::vector<Monster* >::iterator >::iterator deleteIterator = deletedMonsters.begin(); deleteIterator != deletedMonsters.end(); deleteIterator++)
-                {
-                    Monster * monster = **deleteIterator;
-                    monsters.erase(*deleteIterator);
-                    delete monster;
-                }
+                    bulletUpdates++;
+                    monsterUpdate++;
+                    obsteclesUpdate++;
 
-                //remove dead obstecles
-                for(std::vector < std::vector<Obstecle* >::iterator >::iterator deleteIterator = deletedObstecles.begin(); deleteIterator != deletedObstecles.end(); deleteIterator++)
-                {
-                    Obstecle * obstecle = **deleteIterator;
-                    obstecles.erase(*deleteIterator);
-                    delete obstecle;
-                }
-
-                deletedObstecles.clear();
-                deletedBullets.clear();
-                deletedMonsters.clear();
-
-
-                /// add new objects
-                ///
-                // check to add new monster and player
-                if (bulletUpdates >= 20)
-                {
-                    bulletUpdates -= 20;
-
-                    if (glfwGetKey( window, GLFW_KEY_SPACE) == GLFW_PRESS )
+                    // update the player position
+                    if (! (player->update(window, &objects)))
                     {
-                        Bullet * bullet = new Bullet(player->getPosition());
-                        bullet->setIDs(b_vertexPosition_modelspaceID, 0, 0, b_vertexbuffer, 0, 0);
+                        // player collided with an enemy
 
-                        bullets.push_back(bullet);
+                        // reset the levels
+                        monsterUpdate = 0;
+                        obsteclesUpdate = 0;
+                        distance = 0;
+                        collision = true;
+                        player->setPosition(vec3(0, 0, 0));
+                        removeUnessaryObjects(true);
+                        scene->reset();
+                    }
+
+                    // update objects
+                    for (std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); it++)
+                    {
+                        // update the objects
+                        if (! ((*it)->update(window, &objects) ))
+                        {
+                            // object collided with another one
+
+                            // remove the collided object
+                            deletedObjects.push_back(it);
+                        }
+                    }
+
+                    // removing dead objects
+                    removeUnessaryObjects(false);
+
+                    /// add new objects
+                    ///
+                    // check to add new monster and player
+                    if (bulletUpdates >= currentLevel.bulltes)
+                    {
+                        bulletUpdates -= currentLevel.bulltes;
+
+                        if (glfwGetKey( window, GLFW_KEY_SPACE) == GLFW_PRESS )
+                        {
+                            GameObject * bullet = new Bullet(player->getPosition());
+                            bullet->setIDs(b_vertexPosition_modelspaceID, 0, 0, b_vertexbuffer, 0, 0);
+
+                            objects.push_back(bullet);
+                        }
+                    }
+
+                    if (monsterUpdate > currentLevel.monsters)
+                    {
+                        // Generate the random positions for the enemy planes
+                        posx = (rand() % (MAX_NEGATIVE_X * 2)) - MAX_POSITIVE_X;
+                        posy = (rand() % ((MAX_POSITIVE_Y+2) *2)) - MAX_POSITIVE_Y - 2;
+
+                        monsterUpdate -= currentLevel.monsters;
+                        GameObject* monster = new Monster(vec3(posx, posy, posz));
+                        monster->setIDs(m_vertexPosition_modelspaceID, m_vertexUVID, m_uvbuffer, m_vertexbuffer, 0, 0);
+                        monster->setNormals(m_normals);
+                        monster->setTexture(m_TextureID, m_Texture);
+                        monster->setUVs(m_uvs);
+                        monster->setVertices(m_vertices);
+
+                        objects.push_back(monster);
+                    }
+
+                    if (obsteclesUpdate > currentLevel.obstcales)
+                    {
+                        //printf("obstecles %d\n", (int)currentLevel.obstcales);
+                        // generate random position for the obstecle
+                        posx = (rand() % (MAX_POSITIVE_X * 2)) - MAX_POSITIVE_X;
+                        posy = (rand() % ((MAX_POSITIVE_Y+2) *2)) - MAX_POSITIVE_Y-2;
+                        int i = rand() % 5;
+                        GameObject *obstecle = new Obstecle(vec3(posx, posy, 20));
+                        obstecle->setIDs(O_vertexPosition_modelspaceID, O_vertexUVID, O_uvbuffer[i], O_vertexbuffer[i], 0, 0);
+                        obstecle->setNormals(O_normals[i]);
+                        obstecle->setTexture(O_TextureID, O_Texture[rand() % 5]);
+                        obstecle->setUVs(O_uvs[i]);
+                        obstecle->setVertices(O_vertices[i]);
+
+                        objects.push_back(obstecle);
+
+                        obsteclesUpdate -= currentLevel.obstcales;
+                    }
+
+                    ///  -----------------------------------------* Rendering *-----------------------------------------
+
+                    // Draw the player
+                    player->render(MatrixID, Projection, View);
+
+                    // Draw the objects
+                    for (std::list<GameObject *>::iterator it = objects.begin(); it != objects.end(); it++)
+                    {
+                        (*it)->render(MatrixID, Projection, View);
                     }
                 }
-
-                // Generate the random positions for the enemy planes
-                posx = (rand() % (MAX_NEGATIVE_X * 2)) - MAX_POSITIVE_X;
-                posy = (rand() % ((MAX_POSITIVE_Y+2) *2)) - MAX_POSITIVE_Y - 2;
-
-                if (addMonster)
-                {
-                    Monster* monster = new Monster(vec3(posx, posy, posz));
-                    monster->setIDs(m_vertexPosition_modelspaceID, m_vertexUVID, m_uvbuffer, m_vertexbuffer, 0, 0);
-                    monster->setNormals(m_normals);
-                    monster->setTexture(m_TextureID, m_Texture);
-                    monster->setUVs(m_uvs);
-                    monster->setVertices(m_vertices);
-
-                    monsters.push_back(monster);
-                }
-
-                obsteclesUpdate++;
-
-                if (obsteclesUpdate > 80)
-                {
-                    ///TODO: fix the y-axis random number
-                    posx = (rand() % (MAX_POSITIVE_X * 2)) - MAX_POSITIVE_X;
-                    posy = (rand() % ((MAX_POSITIVE_Y+2) *2)) - MAX_POSITIVE_Y-2;
-                    int i = rand() % 5;
-                    Obstecle *obstecle = new Obstecle(vec3(posx, posy, 20));
-                    obstecle->setIDs(O_vertexPosition_modelspaceID, O_vertexUVID, O_uvbuffer[i], O_vertexbuffer[i], 0, 0);
-                    obstecle->setNormals(O_normals[i]);
-                    obstecle->setTexture(O_TextureID, O_Texture[rand() % 5]);
-                    obstecle->setUVs(O_uvs[i]);
-                    obstecle->setVertices(O_vertices[i]);
-
-                    obstecles.push_back(obstecle);
-
-                    numberOfObstecles ++;
-
-                    obsteclesUpdate -= 80;
-                }
-
-                ///  -----------------------------------------* Rendering *-----------------------------------------
-
-                //sprintf(text1,"score:" );
-                //printText2D(text1, 60, 500, 60);
-
-                // Draw the objects
-                player->render(MatrixID, Projection, View);
-
-                // Draw the monsters
-                for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
-                {
-                    (*it)->render(MatrixID, Projection, View);
-                }
-
-                // Draw the bullets
-                for (std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
-                {
-                    (*it)->render(MatrixID, Projection, View);
-                }
-
-                // Draw the obstecles
-                for(std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
-                {
-                    (*it)->render(MatrixID, Projection, View);
-                }
-
-
             }
-
         }
         else
         {
             // game menu
             if (cursor)
             {
-                sprintf(text,">start game" );
-            sprintf(text1,"exit" );
+                printText2D(text2, 50, 500, 60);
+                printText2D(text3, 60, 100, 60);
             }
             else
             {
-                sprintf(text,"start game" );
-            sprintf(text1,">exit" );
+                printText2D(text, 50, 500, 60);
+                printText2D(text1, 60, 100, 60);
             }
 
             if (glfwGetKey( window, GLFW_KEY_UP) == GLFW_PRESS )
-                {
+            {
                     cursor = true;
-                }
-                else if (glfwGetKey( window, GLFW_KEY_DOWN) == GLFW_PRESS )
-                {
-                    cursor = false;
-                }
+            }
+            else if (glfwGetKey( window, GLFW_KEY_DOWN) == GLFW_PRESS )
+            {
+                cursor = false;
+            }
             else if (glfwGetKey( window, GLFW_KEY_ENTER) == GLFW_PRESS )
             {
                 running = gameStarted = cursor;
-                // Delete the text's VBO, the shader and the texture
-                cleanupText2D();
-            }
 
-            printText2D(text, 50, 500, 60);
-            printText2D(text1, 60, 100, 60);
+            }
         }
 
         // Swap buffers
@@ -658,32 +732,21 @@ int main( void )
     glDeleteTextures(1, &O_Texture[4]);
     glDeleteTextures(1, &m_Texture);
     glDeleteTextures(1, &p_Texture);
+    glDeleteTextures(1, &eTexture);
 
-
+    // Delete the text's VBO, the shader and the texture
+    cleanupText2D();
 
     // Close OpenGL window and terminate GLFW
     glfwTerminate();
 
     //delete objects
-
-    delete gameObjects;
     delete scene;
     delete player;
-
-    // delete the monsters
-    for (std::vector<Monster *>::iterator it = monsters.begin(); it != monsters.end(); it++)
-    {
-        delete (*it);
-    }
-
-    // delete the bullets
-    for (std::vector<Bullet *>::iterator it = bullets.begin(); it != bullets.end(); it++)
-    {
-        delete (*it);
-    }
+    delete explosion;
 
     // delete the obstecles
-    for(std::vector<Obstecle *>::iterator it = obstecles.begin(); it != obstecles.end(); it++)
+    for(std::list<GameObject *>::iterator it = objects.begin(); it != objects.end(); it++)
     {
         delete (*it);
     }
@@ -691,3 +754,46 @@ int main( void )
     return 0;
 }
 
+
+void removeUnessaryObjects(bool clear)
+{
+    if (clear)
+    {
+        for(std::list<GameObject* >::iterator it = objects.begin(); it != objects.end(); it++)
+        {
+            printf("%d", (*it)->getObjectType());
+            deletedObjects.push_back(it);
+        }
+    }
+    else
+    {
+        //check for dead bullets
+        for(std::list<GameObject* >::iterator it = objects.begin(); it != objects.end(); it++)
+        {
+            if (!((*it)->isInRange()))
+            {
+                deletedObjects.push_back(it);
+            }
+        }
+    }
+
+    //remove dead obstecles
+    for(std::list < std::list<GameObject* >::iterator >::iterator deleteIterator = deletedObjects.begin(); deleteIterator != deletedObjects.end(); deleteIterator++)
+    {
+        GameObject * object =  **deleteIterator;
+        objects.erase(*deleteIterator);
+        delete object;
+
+    }
+
+    deletedObjects.clear();
+}
+
+
+void delay(int milli)
+{
+    for (int i=0; i<milli; i++)
+    {
+        for (int j=0; j<milli; j++);
+    }
+}

@@ -26,19 +26,6 @@ Bullet::~Bullet()
     printf("Bullet::~Bullet() destructed bullet #%d at x=%d y=%d z=%d\n", bulletCount, (int)_position.x, (int)_position.y, (int)_position.z);
 }
 
-// Gets is in screen range
-bool Bullet::isInRange() const
-{
-    return inRange;
-}
-
-// Initialize object state
-// @Deprecated: use constructor instead
-void Bullet::setup()
-{
-    //nothing
-}
-
 void Bullet::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
     ///debug
@@ -77,7 +64,7 @@ void Bullet::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &
 }
 
 // Update the position of the bullet to move into positive Z
-bool Bullet::update(GLFWwindow*, std::vector<GameObject *> *)
+bool Bullet::update(GLFWwindow*, std::list<GameObject *> *)
 {
     //update bullet position
     if (_position.z < BULLET_BARRIER)

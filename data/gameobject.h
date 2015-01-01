@@ -1,6 +1,7 @@
 #ifndef GAMEOBJECT_H
 #define GAMEOBJECT_H
 
+#include <list>
 #include <vector>
 #include "DEFS.h"
 #include <math.h>
@@ -14,17 +15,13 @@ class GameObject
 {
 public:
     GameObject(vec3 position, GameObjectType type);
-    GameObject();
     virtual ~GameObject();
-
-    //setup and initialize object
-    virtual void setup() = 0;
 
     //especify how the object is drawn to the screen
     virtual void render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View) = 0;
 	
     //update the object state
-    virtual bool update(GLFWwindow* window, std::vector<GameObject *> *) = 0;
+    virtual bool update(GLFWwindow* window, std::list<GameObject *> *);
 
     //Checks collision with another GameObject
     virtual bool checkCollision(GameObject *);
@@ -61,7 +58,14 @@ public:
 
     //get the collider of the game object
     Collider getCollider() const;
+
+    //check wether the bullet is still in screen
+    bool isInRange() const;
+
 protected:
+
+    //bullet is still alive
+    bool inRange;
 
     //type of game object
     GameObjectType _objectType;
@@ -74,8 +78,10 @@ protected:
     //vertices
     std::vector< glm::vec3 > _vertices;
 
+    // uvs
     std::vector< glm::vec2 > _uvs;
 
+    // normals
     std::vector< glm::vec3 > _normals;
 
     //vertex position handle
