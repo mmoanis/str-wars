@@ -16,7 +16,7 @@ using namespace glm;
 #define MAX_NEGATIVE_X -5
 #define MAX_NEGATIVE_Y -3
 #define MAX_NEGATIVE_Z -4
-#define BULLET_BARRIER 10
+#define BULLET_BARRIER 5
 #define UPDATES_PER_SECOND 30
 
 

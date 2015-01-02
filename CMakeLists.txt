@@ -38,6 +38,7 @@ include_directories(
 	external/glew-1.9.0/include/
 	external/assimp-3.0.1270/include/
 	external/bullet-2.81-rev2613/src/
+        external/SMFL-2.2/include
 	.
 )
 
@@ -71,12 +72,12 @@ data/bullet.cpp
         data/player.h
         data/scene.cpp
         data/scene.h
-        data/scenemanager.cpp
-        data/scenemanager.h
+        data/level.h
+        data/level.cpp
+        data/explosion.h
+        data/explosion.cpp
 	common/shader.cpp
-	common/shader.hpp
-    common/controls.cpp
-	common/controls.hpp
+        common/shader.hpp
         common/objloader.cpp
 common/objloader.hpp
 common/quaternion_utils.cpp

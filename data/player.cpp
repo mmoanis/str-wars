@@ -6,7 +6,7 @@ Player::Player(vec3 position): GameObject(position, PLAYER)
     printf("Player::Player() at x=%d y=%d z=%d\n", (int)position.x, (int)position.y, (int)position.z);
 
     _health = 100;
-    anglex = 0.0f;
+    anglex = 0;
     anglez = 0;
     angley = 3.14f;
     inRange = true;
@@ -22,9 +22,9 @@ Player::Player(vec3 position): GameObject(position, PLAYER)
     //scaley = 0.20;
 
     // set the collider
-    this->collider.sizex = 0.65f;
+    this->collider.sizex = 0.50f;
     this->collider.sizey = 0.25f;
-    this->collider.sizez = 0.55f
+    this->collider.sizez = 0.40f
 
             ;
 }
@@ -38,13 +38,14 @@ Player::~Player()
 // Check collision with other objects
 bool Player::checkCollision(GameObject * other)
 {
+    Collider collider = other->getCollider();
     vec3 position = other ->getPosition();
-    //printf("\n%f %f %f\n", (float)_position.x, (float)position.x, (float)collider.sizex);
-    //printf("%f %f %f\n", (float)_position.y, (float)position.y, (float)collider.sizey);
-    //printf("%f %f %f\n", (float)_position.z, (float)position.z, (float)collider.sizez);
-    bool x = int (abs(_position.x - position.x) * 100) < (int) (this->collider.sizex * 100);
-    bool y = int (abs(_position.y - position.y) * 100) < int (this->collider.sizey * 100);
-    bool z = int (abs(_position.z - position.z) * 100) < int (this->collider.sizez * 100);
+    printf("\n%f %f %f\n", (float)_position.x, (float)position.x, (float)collider.sizex + (float)this->collider.sizex);
+    printf("%f %f %f\n", (float)_position.y, (float)position.y, (float)collider.sizey + this->collider.sizey);
+    printf("%f %f %f\n", (float)_position.z, (float)position.z, (float)collider.sizez + this->collider.sizez);
+    bool x = int (abs(_position.x - position.x) * 100) <= (int) ((this->collider.sizex + collider.sizex) * 100);
+    bool y = int (abs(_position.y - position.y) * 100) <= int ((this->collider.sizey + collider.sizey) * 100);
+    bool z = int (abs(_position.z - position.z) * 100) <= int ((this->collider.sizez + collider.sizez) * 100);
 
     return x && y && z;
 }

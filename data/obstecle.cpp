@@ -82,8 +82,9 @@ bool Obstecle::update(GLFWwindow*, std::list<GameObject *> *)
 {
     if (_position.z >= MAX_NEGATIVE_Z)
     {
-        _position.z-= 0.15f;
-        //printf("updated %f\n",(float) _position.z);
+        printf("updated %f\n",(float) _position.z);
+        _position.z-= 0.05f;
+        printf("updated %f\n",(float) _position.z);
     }
     else
         inRange = false;    //mark dead

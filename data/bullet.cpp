@@ -9,15 +9,17 @@ Bullet::Bullet(vec3 position): GameObject(position, BULLET)
     bulletCount++;
     printf("Bullet::Bullet() created bullet #%d at x=%d y=%d z=%d\n", bulletCount, (int)position.x, (int)position.y, (int)position.z);
     inRange = true;
-    anglez = 3;
+    anglez = 0;
     anglex = 0;
     angley = 0;
-    scalex = scaley = scalez = 0.05;
+    scalex =  0.02;
+    scaley = 0.02;
+    scalez = 0.02;
     RotationMatrix = eulerAngleYXZ(angley, anglex,anglez);
     ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
 
     // set the collider
-    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.05;
+    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.02;
 }
 
 // Destructor
@@ -68,12 +70,15 @@ bool Bullet::update(GLFWwindow*, std::list<GameObject *> *)
 {
     //update bullet position
     if (_position.z < BULLET_BARRIER)
-        _position.z+=0.2f;
+    {
+        //_position.z+=0.2f;
+        printf("\n%f %f %f\n", (float)_position.x, (float)_position.y, (float)_position.z);
+    }
     else
         inRange = false;    //mark dead
 
-    anglez++;
-    RotationMatrix = eulerAngleYXZ(angley, anglex,anglez);
+    //anglez++;
+    //RotationMatrix = eulerAngleYXZ(angley, anglex,anglez);
 
     return true;
 }

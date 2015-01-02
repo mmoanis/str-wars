@@ -15,7 +15,7 @@ Monster::Monster(vec3 position): GameObject(position, MONSTER)
     inRange = true;
 
     // set the collider
-    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.35f;
+    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.55f;
 }
 
 // Destructor
@@ -102,7 +102,7 @@ bool Monster::update(GLFWwindow*, std::list<GameObject *> * gameObjects)
     if (_position.z >= MAX_NEGATIVE_Z)
     {
         _position.z-= 0.09f;
-        printf("updated %f\n",(float) _position.z);
+        //printf("updated %f\n",(float) _position.z);
     }
     else
         inRange = false;

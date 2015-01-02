@@ -4,7 +4,7 @@
 #include <list>
 #include <vector>
 #include <math.h>
-#include <algorithm>
+#include <SFML/Audio.hpp>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -109,7 +109,7 @@ int main( void )
     glm::mat4 Projection = glm::perspective(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
     // Camera matrix
     glm::mat4 View       = glm::lookAt(
-                 glm::vec3(0, 1,-10), //position
+                 glm::vec3(0, 2,-10), //position
                  glm::vec3(0,0,0), // and looks at the origin
                  glm::vec3(0,1,0)  // Head is up
                  );
@@ -490,7 +490,7 @@ int main( void )
 
     printf("main::main() entering game loop\n");
 
-    double lastTime = glfwGetTime(), deltaTime=0.0f;
+    //double lastTime = glfwGetTime(), deltaTime=0.0f;
     int bulletUpdates = 0;
     float posx, posy, posz=20;
     float obsteclesUpdate = 0;
@@ -504,6 +504,12 @@ int main( void )
     Level currentLevel;
     levelLoader.getCurrentLevel(currentLevel);
 
+
+    /*sf::SoundBuffer sb;
+    if (!sb.loadFromFile("0614.ogg")) printf("failed to load sound\n");
+    sf::Sound sound;
+    sound.setBuffer(sb);
+    sound.play();*/
 
     //printf("%d\n", (int)currentLevel.obstcales);
 
@@ -521,25 +527,19 @@ int main( void )
         if (gameStarted)
         {
             // update frame time
-            deltaTime += (glfwGetTime() - lastTime) *  UPDATES_PER_SECOND;
-            lastTime = glfwGetTime();
+            //deltaTime += (glfwGetTime() - lastTime) *  UPDATES_PER_SECOND;
+            //lastTime = glfwGetTime();
 
             if (collision)
             {
                 // render the death frame
                 explosion->render(MatrixID, Projection, View);
+                deathTime++;
 
-                if (deltaTime >= 0.5f)
+                if (deathTime > 50)
                 {
-                    deltaTime -= 0.5f;
-
-                    deathTime++;
-
-                    if (deathTime > 50)
-                    {
-                        collision = false;
-                        deathTime = 0;
-                    }
+                    collision = false;
+                    deathTime = 0;
                 }
             }
             else
@@ -563,13 +563,26 @@ int main( void )
 
                 ///  -----------------------------------------* Update gameobjects state *---------------------------------
                 //get user action and execute it
-                if (deltaTime >= 0.5f)
-                {
-                    deltaTime-= 0.5f;
+                //if (deltaTime >= 0.5f)
+                //{
+                  //  deltaTime-= 0.5f;
 
                     bulletUpdates++;
                     monsterUpdate++;
                     obsteclesUpdate++;
+
+                    // update objects
+                    for (std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); it++)
+                    {
+                        // update the objects
+                        if (! ((*it)->update(window, &objects) ))
+                        {
+                            // object collided with another one
+
+                            // remove the collided object
+                            deletedObjects.push_back(it);
+                        }
+                    }
 
                     // update the player position
                     if (! (player->update(window, &objects)))
@@ -584,19 +597,6 @@ int main( void )
                         player->setPosition(vec3(0, 0, 0));
                         removeUnessaryObjects(true);
                         scene->reset();
-                    }
-
-                    // update objects
-                    for (std::list<GameObject*>::iterator it = objects.begin(); it != objects.end(); it++)
-                    {
-                        // update the objects
-                        if (! ((*it)->update(window, &objects) ))
-                        {
-                            // object collided with another one
-
-                            // remove the collided object
-                            deletedObjects.push_back(it);
-                        }
                     }
 
                     // removing dead objects
@@ -664,7 +664,7 @@ int main( void )
                     {
                         (*it)->render(MatrixID, Projection, View);
                     }
-                }
+               // }
             }
         }
         else

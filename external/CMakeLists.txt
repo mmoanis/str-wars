@@ -35,6 +35,15 @@ set(OPENGL_LIBRARY
 )
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
+### SFML
+
+add_subdirectory (SFML-2.2)
+
+include_directories(
+    SFML-2.2/include/SFML
+    SFML-2.2/lib
+)
+
 ### GLEW ###
 
 set(GLEW_SOURCE
