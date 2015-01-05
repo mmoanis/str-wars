@@ -4,7 +4,11 @@
 #include <list>
 #include <vector>
 #include <math.h>
-#include <SFML/Audio.hpp>
+
+// Audio library
+#include <SDL2/SDL_audio.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
 
 // Include GLEW
 #include <GL/glew.h>
@@ -32,6 +36,7 @@ using namespace glm;
 #include "level.h"
 #include "intro.h"
 
+
 Intro * intro;
 Scene * scene;
 Player * player;
@@ -42,6 +47,19 @@ std::list < GameObject * > objects;
 
 // Remove objects that have got out of game ranges, or remove all objects.
 void removeUnessaryObjects(bool clear);
+
+/*
+// sound variable declarations
+static Uint8 *audio_pos; // global pointer to the audio buffer to be played
+static Uint32 audio_len; // remaining length of the sample we have to play
+
+static Uint8 *bullet_audio_pos; // global pointer to the audio buffer to be played
+static Uint32 bullet_audio_len; // remaining length of the sample we have to play
+
+void game_audio_theme_callback(void *userdata, Uint8 *stream, int len);
+void bullet_audio_callback(void *userdata, Uint8 *stream, int len);
+*/
+
 
 ///
 /// Holds the main context of the game
@@ -94,6 +112,71 @@ int main( void )
 
     // Cull triangles which normal is not towards the camera
     glEnable(GL_CULL_FACE);
+
+
+    /// Initialize sound
+
+    if (SDL_Init(SDL_INIT_AUDIO) < 0)
+                return -1;
+
+    Mix_Chunk* bullet_effect;
+    Mix_Chunk* collision_effect;
+    Mix_Music* theme;
+
+    Mix_OpenAudio(22050,MIX_DEFAULT_FORMAT,2,4096);
+    theme = Mix_LoadMUS("mothership1.wav");
+    bullet_effect = Mix_LoadWAV("bullet.wav");
+    collision_effect = Mix_LoadWAV("collision.wav");
+
+    // play the theme music
+    Mix_PlayMusic(theme, -1);
+
+    /*// local variables
+    static Uint32 wav_length; // length of our sample
+    static Uint8 *wav_buffer; // buffer containing our audio file
+    static SDL_AudioSpec wav_spec; // the specs of our piece of music
+
+    static Uint32 bullet_wav_length; // length of our sample
+    static Uint8 * bullet_wav_buffer; // buffer containing our audio file
+    static SDL_AudioSpec bullet_wav_spec; // the specs of our piece of music
+
+
+    // Load the game theme music
+    // the specs, length and buffer of our wav are filled
+    if( SDL_LoadWAV("mothership1.wav", &wav_spec, &wav_buffer, &wav_length) == NULL ){
+      return 1;
+    }
+
+    // Load the WAV
+    // the specs, length and buffer of our wav are filled
+    if( SDL_LoadWAV("bullet.wav", &bullet_wav_spec, &bullet_wav_buffer, &bullet_wav_length) == NULL ){
+      return 1;
+    }
+
+    // set the callback function
+    wav_spec.callback = game_audio_theme_callback;
+    wav_spec.userdata = NULL;
+    // set our global static variables
+    audio_pos = wav_buffer; // copy sound buffer
+    audio_len = wav_length; // copy file length
+
+    // set the callback function
+    bullet_wav_spec.callback = bullet_audio_callback;
+    bullet_wav_spec.userdata = NULL;
+    // set our global static variables
+    bullet_audio_pos = wav_buffer; // copy sound buffer
+    bullet_audio_len = wav_length; // copy file length
+
+    // Open the audio device
+    if ( SDL_OpenAudio(&wav_spec, NULL) < 0 ){
+      fprintf(stderr, "Couldn't open audio: %s\n", SDL_GetError());
+      exit(-1);
+    }
+
+    // Start playing
+    SDL_PauseAudio(0);*/
+
+    /// Initialzie the shaders, and camera space
 
     // Create and compile our GLSL program from the shaders
     GLuint program2ID = LoadShaders( "StandardShading.vertexshader", "StandardShading.fragmentshader" );
@@ -612,6 +695,7 @@ int main( void )
 
     printf("main::main() entering game loop\n");
 
+    // game parameters
     int bulletUpdates = 0;
     float posx, posy, posz=20;
     float obsteclesUpdate = 0;
@@ -626,13 +710,6 @@ int main( void )
     int monsterUpdate = 0;
     Level currentLevel;
     levelLoader.getCurrentLevel(currentLevel);
-
-
-    /*sf::SoundBuffer sb;
-    if (!sb.loadFromFile("0614.ogg")) printf("failed to load sound\n");
-    sf::Sound sound;
-    sound.setBuffer(sb);
-    sound.play();*/
 
     do{
         // Clear the screen
@@ -741,6 +818,9 @@ int main( void )
 
                     if (glfwGetKey( window, GLFW_KEY_SPACE) == GLFW_PRESS )
                     {
+                        // make the audio effect
+
+                        // make a bullet object
                         GameObject * bullet = new Bullet(player->getPosition());
 
                         // set vertices and UVs of the bullet
@@ -925,6 +1005,13 @@ int main( void )
     //glDeleteTextures(1, &Tex2);
     //glDeleteTextures(1, &Tex3);
 
+    // shut audio down
+    Mix_FreeChunk(collision_effect);
+    Mix_FreeChunk(bullet_effect);
+    Mix_FreeMusic(theme);
+    Mix_CloseAudio();
+    SDL_Quit();
+
     // Delete the text's VBO, the shader and the texture
     cleanupText2D();
 
@@ -980,3 +1067,39 @@ void removeUnessaryObjects(bool clear)
 
     deletedObjects.clear();
 }
+
+/*
+// audio callback functions
+// here you have to copy the data of your audio buffer into the
+// requesting audio buffer (stream)
+// you should only copy as much as the requested length (len)
+void game_audio_theme_callback(void *userdata, Uint8 *stream, int len)
+{
+
+    if (audio_len ==0)
+        return;
+
+    len = ( len > audio_len ? audio_len : len );
+    //SDL_memcpy (stream, audio_pos, len); 					// simply copy from one buffer into the other
+    SDL_MixAudio(stream, audio_pos, len, SDL_MIX_MAXVOLUME);// mix from one buffer into another
+
+    audio_pos += len;
+    audio_len -= len;
+}
+
+void bullet_audio_callback(void *userdata, Uint8 *stream, int len)
+{
+
+    if (audio_len ==0)
+        return;
+
+    len = ( len > audio_len ? audio_len : len );
+    //SDL_memcpy (stream, audio_pos, len); 					// simply copy from one buffer into the other
+    SDL_MixAudio(stream, audio_pos, len, SDL_MIX_MAXVOLUME);// mix from one buffer into another
+
+    audio_pos += len;
+    audio_len -= len;
+}
+
+*/
+
