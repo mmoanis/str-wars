@@ -153,16 +153,16 @@ int main( void )
     // /////////////////////////////////////////////////////////////////////////////////////////////////
     // The intro
 
-    intro = new Intro();
+    //intro = new Intro();
     // Load the textures
-    GLuint Tex1 = loadBMP_custom("1.bmp");
-    GLuint Tex2 = loadBMP_custom("2.bmp");
-    GLuint Tex3 = loadBMP_custom("3.bmp");
+    //GLuint Tex1 = loadBMP_custom("1.bmp");
+    //GLuint Tex2 = loadBMP_custom("2.bmp");
+    //GLuint Tex3 = loadBMP_custom("3.bmp");
 
-    intro->vertexPosition_modelspaceID = vertexPosition_modelspaceID;
-    intro->vertexUVID = vertexUVID;
-    intro->Texture = Tex1;
-    intro->TextureID = TexID;
+    //intro->vertexPosition_modelspaceID = vertexPosition_modelspaceID;
+    //intro->vertexUVID = vertexUVID;
+    //intro->Texture = Tex1;
+    //intro->TextureID = TexID;
 
     //
     // The intro ends
@@ -921,9 +921,9 @@ int main( void )
     glDeleteTextures(1, &p_Texture);
     glDeleteTextures(1, &eTexture);
     glDeleteTextures(1, &Tex);
-    glDeleteTextures(1, &Tex1);
-    glDeleteTextures(1, &Tex2);
-    glDeleteTextures(1, &Tex3);
+    //glDeleteTextures(1, &Tex1);
+    //glDeleteTextures(1, &Tex2);
+    //glDeleteTextures(1, &Tex3);
 
     // Delete the text's VBO, the shader and the texture
     cleanupText2D();

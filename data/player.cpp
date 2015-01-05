@@ -15,14 +15,10 @@ Player::Player(vec3 position): GameObject(position, PLAYER)
     RotationMatrix = eulerAngleYXZ(angley, anglex, anglez);//yaw, pitch and roll. Measured in radians
     ScalingMatrix = scale(mat4(), vec3(scalex, scaley, scalez));
 
-    //scalez = 0.5;
-    //scalex = 0.60;
-    //scaley = 0.20;
-
     // set the collider
-    this->collider.sizex = 0.50f;
-    this->collider.sizey = 0.25f;
-    this->collider.sizez = 0.40f
+    this->collider.sizex = 0.38f;
+    this->collider.sizey = 0.05f;
+    this->collider.sizez = 0.3f
 
             ;
 }
@@ -40,14 +36,16 @@ bool Player::checkCollision(GameObject * other)
     vec3 position = other ->getPosition();
 
     // uncomment in debuging
-    //printf("\n%f %f %f\n", (float)_position.x, (float)position.x, (float)collider.sizex + (float)this->collider.sizex);
-    //printf("%f %f %f\n", (float)_position.y, (float)position.y, (float)collider.sizey + this->collider.sizey);
-    //printf("%f %f %f\n", (float)_position.z, (float)position.z, (float)collider.sizez + this->collider.sizez);
+    printf("\n%f %f %f\n", (float)_position.x, (float)position.x, (float)collider.sizex + (float)this->collider.sizex);
+    printf("%f %f %f\n", (float)_position.y, (float)position.y, (float)collider.sizey + this->collider.sizey);
+    printf("%f %f %f\n", (float)_position.z, (float)position.z, (float)collider.sizez + this->collider.sizez);
     bool x = int (abs(_position.x - position.x) * 100) <= (int) ((this->collider.sizex + collider.sizex) * 100);
     bool y = int (abs(_position.y - position.y) * 100) <= int ((this->collider.sizey + collider.sizey) * 100);
     bool z = int (abs(_position.z - position.z) * 100) <= int ((this->collider.sizez + collider.sizez) * 100);
+    //bool sz = (position.z - _position.z > 0);
+    //bool signed_z = int ((position.z - _position.z) * 100) <= int ((this->collider.sizez + collider.sizez) * 100);
 
-    return x && y && z;
+    return x && y && z;//(z || (signed_z&&sz));
 }
 
 // Draws the player on the screen

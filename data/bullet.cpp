@@ -12,7 +12,7 @@ Bullet::Bullet(vec3 position): GameObject(position, BULLET)
     anglez = 0;
     anglex = 0;
     angley = 0;
-    scalex =  0.02f;
+    scalex = 0.02f;
     scaley = 0.02f;
     scalez = 0.02f;
     RotationMatrix = eulerAngleYXZ(angley, anglex,anglez);
@@ -82,8 +82,6 @@ void Bullet::render(const GLuint &MatrixID, const GLuint &ModelMatrixID, const G
 // Update the position of the bullet to move into positive Z
 bool Bullet::update(GLFWwindow*, std::list<GameObject *> *)
 {
-    //printf("\nbullet position %f %f %f\n", (float)_position.x, (float)_position.y, (float)_position.z);
-
     //update bullet position
     if (_position.z < BULLET_BARRIER)
     {
@@ -92,7 +90,7 @@ bool Bullet::update(GLFWwindow*, std::list<GameObject *> *)
     else
         inRange = false;    //mark dead
 
-    //anglex++;
+    anglex++;
     RotationMatrix = eulerAngleYXZ(angley, anglex,anglez);
 
     return true;
