@@ -36,6 +36,11 @@ bool GameObject::isInRange() const
     return inRange;
 }
 
+void GameObject::setIsInRange(bool r)
+{
+    this->inRange = r;
+}
+
 // Sets the position of object
 void GameObject::setPosition(vec3 position)
 {
@@ -93,7 +98,8 @@ void GameObject::setTexture(const GLuint &tid, const GLuint &t)
 
 // Sets handler IDS
 void GameObject::setIDs(const GLuint &vertexPosition_modelspaceID, const GLuint &vertexUVID, const GLuint &uvbuffer,
-                        const GLuint &vertexbuffer, const GLuint &vertexColorID, const GLuint &colorbuffer)
+                        const GLuint &vertexbuffer, const GLuint &vertexColorID, const GLuint &colorbuffer,
+                        const GLuint &vertexNormal_modelspaceID, const GLuint &normalbuffer)
 {
     this->vertexPosition_modelspaceID = vertexPosition_modelspaceID;
     this->vertexUVID = vertexUVID;
@@ -101,6 +107,8 @@ void GameObject::setIDs(const GLuint &vertexPosition_modelspaceID, const GLuint 
     this->vertexbuffer = vertexbuffer;
     this->vertexColorID = vertexColorID;
     this->colorbuffer = colorbuffer;
+    this->vertexNormal_modelspaceID = vertexNormal_modelspaceID;
+    this->normalbuffer = normalbuffer;
 }
 
 // Gets the collider of the object

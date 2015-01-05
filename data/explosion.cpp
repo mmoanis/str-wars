@@ -18,10 +18,12 @@ Explode::~Explode()
 
 }
 
-void Explode::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
+void Explode::render(const GLuint &MatrixID, const GLuint &ModelMatrixID, const GLuint &ViewMatrixID, const mat4 &Projection, const mat4 &View)
 {
     MVP = Projection * View*TranslationMatrix*ScalingMatrix*RotationMatrix ;
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &(mat4(1.0))[0][0]);
+    glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
 
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);

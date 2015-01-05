@@ -18,7 +18,7 @@ public:
     virtual ~GameObject();
 
     //especify how the object is drawn to the screen
-    virtual void render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View) = 0;
+    virtual void render(const GLuint &MatrixID, const GLuint &ModelMatrixID, const GLuint &ViewMatrixID, const mat4 &Projection, const mat4 &View) = 0;
 	
     //update the object state
     virtual bool update(GLFWwindow* window, std::list<GameObject *> *);
@@ -54,13 +54,17 @@ public:
 
     //set the handler of vertices, colors and UVs of the object
     void setIDs(const GLuint &vertexPosition_modelspaceID, const GLuint &vertexUVID, const GLuint &uvbuffer,
-                const GLuint &vertexbuffer, const GLuint &vertexColorID, const GLuint &colorbuffer);
+                const GLuint &vertexbuffer, const GLuint &vertexColorID, const GLuint &colorbuffer,
+                const GLuint &vertexNormal_modelspaceID, const GLuint &normalbuffer);
 
     //get the collider of the game object
     Collider getCollider() const;
 
     //check wether the bullet is still in screen
     bool isInRange() const;
+
+    // set the flag inRange to indicate that object in view port
+    void setIsInRange(bool r);
 
 protected:
 
@@ -104,6 +108,8 @@ protected:
     GLuint vertexColorID;
 
     GLuint colorbuffer;
+    GLuint vertexNormal_modelspaceID;
+    GLuint normalbuffer;
 
     ///transformation matrices
     glm::mat4 RotationMatrix;

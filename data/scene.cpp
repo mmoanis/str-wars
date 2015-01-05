@@ -132,10 +132,11 @@ void Scene::update()
         break;
     }
 
+    printf("level %d loaded\n", levelCount);
     levelCount++;
 }
 
-void Scene :: render(const GLuint MatrixID, const mat4 Projection, const mat4 View)
+void Scene :: render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
 {
     glm::mat4 ScalingMatrix = scale(mat4(), vec3(30.0f,30.0f,30.0f));
     glm::mat4   TranslationMatrix = translate(mat4(), vec3(0.0f, 0.0f,50.0f));

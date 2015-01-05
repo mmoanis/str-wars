@@ -25,12 +25,12 @@ Obstecle::~Obstecle()
 }
 
 // Draws the Monster on the screen
-void Obstecle::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
+void Obstecle::render(const GLuint &MatrixID, const GLuint &ModelMatrixID, const GLuint &ViewMatrixID, const mat4 &Projection, const mat4 &View)
 {
     //make the matrices for the transformation
-    TranslationMatrix = translate(mat4(), vec3((int)_position.x, (int)_position.y,(int)_position.z));
+    TranslationMatrix = translate(mat4(), vec3(_position.x, _position.y,_position.z));
 
-    glm::mat4 Model = TranslationMatrix* RotationMatrix* ScalingMatrix;//order of multiplication is important (try different values above and different order of multiplication)
+    glm::mat4 Model = TranslationMatrix* RotationMatrix* ScalingMatrix;//*translate(mat4(), vec3(_position.x * -1, _position.y * -1, _position.z * -1));//order of multiplication is important (try different values above and different order of multiplication)
 
     //make the MVP matix
     glm::mat4 MVP        = Projection * View * Model;
@@ -39,6 +39,8 @@ void Obstecle::render(const GLuint &MatrixID, const mat4 &Projection, const mat4
     // in the "MVP" uniform
     // For each object you render, since the MVP will be different (at least the Model part)
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &Model[0][0]);
+    glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
 
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
@@ -70,11 +72,24 @@ void Obstecle::render(const GLuint &MatrixID, const mat4 &Projection, const mat4
         (void*)0                      // array buffer offset
     );
 
+    // 3rd attribute buffer : normals
+    glEnableVertexAttribArray(vertexNormal_modelspaceID);
+    glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+    glVertexAttribPointer(
+        vertexNormal_modelspaceID,    // The attribute we want to configure
+        3,                            // size
+        GL_FLOAT,                     // type
+        GL_FALSE,                     // normalized?
+        0,                            // stride
+        (void*)0                      // array buffer offset
+    );
+
     // Draw the triangleS !
     glDrawArrays(GL_TRIANGLES, 0, _vertices.size());
 
     glDisableVertexAttribArray(vertexPosition_modelspaceID);
     glDisableVertexAttribArray(vertexUVID);
+    glDisableVertexAttribArray(vertexNormal_modelspaceID);
 }
 
 // Update the obstecle state
@@ -82,9 +97,9 @@ bool Obstecle::update(GLFWwindow*, std::list<GameObject *> *)
 {
     if (_position.z >= MAX_NEGATIVE_Z)
     {
-        printf("updated %f\n",(float) _position.z);
+        //printf("updated %f\n",(float) _position.z);
         _position.z-= 0.05f;
-        printf("updated %f\n",(float) _position.z);
+        //printf("updated %f\n",(float) _position.z);
     }
     else
         inRange = false;    //mark dead

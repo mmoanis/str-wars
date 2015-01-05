@@ -9,7 +9,7 @@ public:
     virtual ~Monster();
 
     // Especify how the object is drawn to the screen.
-    virtual void render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View);
+    virtual void render(const GLuint &MatrixID, const GLuint &ModelMatrixID, const GLuint &ViewMatrixID, const mat4 &Projection, const mat4 &View);
 
     // Update the object state
     virtual bool update(GLFWwindow* window, std::list<GameObject *> *);

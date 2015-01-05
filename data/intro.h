@@ -20,39 +20,22 @@ using namespace glm;
 #include <glm/gtx/norm.hpp>//rotation
 
 ///
-/// \brief The Scene class holds the context of the game scene.
+/// \brief
 ///
-class Scene
+class Intro
 {
 public:
-    Scene();
-    inline  ~Scene(){}
-    void render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View);
-
-    // Update the scene according to the level.
-    void update();
-
-    // Reset the scene to the default.
-    void reset();
+    Intro();
+    void render(const GLuint &MatrixID, const GLuint &ModelMatrixID, const GLuint &ViewMatrixID, const mat4 &Projection, const mat4 &View);
 
     //
-    glm::mat4 MVP;
+    mat4 MVP;
     GLuint vertexPosition_modelspaceID;
     GLuint vertexUVID ;
     GLuint Texture;
     GLuint TextureID;
-    glm::mat4 Model;
-    GLuint MatrixID ;
-    GLuint ViewMatrixID ;
-    GLuint ModelMatrixID ;
     GLuint vertexbuffer;
     GLuint uvbuffer;
-    GLuint vertexNormal_modelspaceID;
-    float anglex;
-    float angley;
-
-    int levelCount;
-
 };
 
 #endif // SCENE_H

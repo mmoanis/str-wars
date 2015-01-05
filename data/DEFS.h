@@ -30,6 +30,10 @@ struct Collider
     float sizez;
 };
 
+
+///
+//// Defines the various types of game objects
+///
 enum GameObjectType {
     PLAYER,
     MONSTER,

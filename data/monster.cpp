@@ -15,7 +15,9 @@ Monster::Monster(vec3 position): GameObject(position, MONSTER)
     inRange = true;
 
     // set the collider
-    this->collider.sizex = this->collider.sizey = this->collider.sizez = 0.55f;
+    this->collider.sizex = 0.45f;
+    this->collider.sizey = 0.50f;
+    this->collider.sizez = 0.40f;
 }
 
 // Destructor
@@ -26,29 +28,27 @@ Monster::~Monster()
 
 bool Monster::checkCollision(GameObject *other)
 {
-    //Collider collider = other ->getCollider();
+    Collider collider = other->getCollider();
     vec3 position = other ->getPosition();
 
-    if ( (abs(_position.x - position.x)) <= this->collider.sizex)
-    {
-        if ( (abs(_position.y - position.y)) <= this->collider.sizey)
-        {
-            if ( (abs(_position.z - position.z)) <= this->collider.sizez)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
+    // uncomment in debuging
+    //printf("\n%f %f %f\n", (float)_position.x, (float)position.x, (float)collider.sizex + (float)this->collider.sizex);
+    //printf("%f %f %f\n", (float)_position.y, (float)position.y, (float)collider.sizey + this->collider.sizey);
+    //printf("%f %f %f\n", (float)_position.z, (float)position.z, (float)collider.sizez + this->collider.sizez);
+    bool x = int (abs(_position.x - position.x) * 100) <= (int) ((this->collider.sizex + collider.sizex) * 100);
+    bool y = int (abs(_position.y - position.y) * 100) <= int ((this->collider.sizey + collider.sizey) * 100);
+    bool z = int (abs(_position.z - position.z) * 100) <= int ((this->collider.sizez + collider.sizez) * 100);
+
+    return x && y && z;
 }
 
 // Draws the Monster on the screen
-void Monster::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 &View)
+void Monster::render(const GLuint &MatrixID, const GLuint &ModelMatrixID, const GLuint &ViewMatrixID, const mat4 &Projection, const mat4 &View)
 {
     //make the matrices for the transformation
-    TranslationMatrix = translate(mat4(), vec3((int)_position.x, (int)_position.y,(int)_position.z));
+    TranslationMatrix = translate(mat4(), vec3(_position.x, _position.y, _position.z));
 
-    glm::mat4 Model = TranslationMatrix* RotationMatrix* ScalingMatrix;//order of multiplication is important (try different values above and different order of multiplication)
+    glm::mat4 Model = TranslationMatrix* RotationMatrix* ScalingMatrix;//*translate(mat4(), vec3(_position.x * -1, _position.y * -1, _position.z * -1));//order of multiplication is important (try different values above and different order of multiplication)
 
     //make the MVP matix
     glm::mat4 MVP        = Projection * View * Model;
@@ -57,6 +57,8 @@ void Monster::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 
     // in the "MVP" uniform
     // For each object you render, since the MVP will be different (at least the Model part)
     glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
+    glUniformMatrix4fv(ModelMatrixID, 1, GL_FALSE, &Model[0][0]);
+    glUniformMatrix4fv(ViewMatrixID, 1, GL_FALSE, &View[0][0]);
 
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
@@ -88,11 +90,24 @@ void Monster::render(const GLuint &MatrixID, const mat4 &Projection, const mat4 
         (void*)0                      // array buffer offset
     );
 
+    // 3rd attribute buffer : normals
+    glEnableVertexAttribArray(vertexNormal_modelspaceID);
+    glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+    glVertexAttribPointer(
+        vertexNormal_modelspaceID,    // The attribute we want to configure
+        3,                            // size
+        GL_FLOAT,                     // type
+        GL_FALSE,                     // normalized?
+        0,                            // stride
+        (void*)0                      // array buffer offset
+    );
+
     // Draw the triangleS !
     glDrawArrays(GL_TRIANGLES, 0, _vertices.size()); // 12*3 indices starting at 0 -> 12 triangles
 
     glDisableVertexAttribArray(vertexPosition_modelspaceID);
     glDisableVertexAttribArray(vertexUVID);
+    glDisableVertexAttribArray(vertexNormal_modelspaceID);
 }
 
 // Update the player states
@@ -112,6 +127,7 @@ bool Monster::update(GLFWwindow*, std::list<GameObject *> * gameObjects)
     {
         if ((*it)->getObjectType() == BULLET && checkCollision((*it)))
         {
+            (*it) -> setIsInRange(false);
             vec3 pos = (*it)->getPosition();
             printf("**** x:%d y:%d z:%d ***\n", (int)_position.x, (int)_position.y, (int)_position.z);
             printf("-------------**** %d x:%d y:%d z:%d ***-------------\n", (*it)->getObjectType(), (int)pos.x, (int)pos.y, (int)pos.z);
