@@ -117,16 +117,23 @@ int main( void )
     /// Initialize sound
 
     if (SDL_Init(SDL_INIT_AUDIO) < 0)
-                return -1;
+    {
+        printf("failed to intialize SDL\n");
+        return -1;
+    }
 
+    // the mix
+    Mix_Chunk* credits_theme;
     Mix_Chunk* bullet_effect;
     Mix_Chunk* collision_effect;
     Mix_Music* theme;
+
 
     Mix_OpenAudio(22050,MIX_DEFAULT_FORMAT,2,4096);
     theme = Mix_LoadMUS("mothership1.wav");
     bullet_effect = Mix_LoadWAV("bullet.wav");
     collision_effect = Mix_LoadWAV("collision.wav");
+    credits_theme = Mix_LoadWAV("credit.wav");
 
     // play the theme music
     Mix_PlayMusic(theme, -1);
@@ -786,6 +793,9 @@ int main( void )
                     {
                         // object collided with another one
 
+                        // make sound effect
+                        Mix_PlayChannel(-1,collision_effect,0);
+
                         // remove the collided object
                         deletedObjects.push_back(it);
                     }
@@ -795,6 +805,9 @@ int main( void )
                 if (! (player->update(window, &objects)))
                 {
                     // player collided with an enemy
+
+                    // make sound effect
+                    Mix_PlayChannel(-1,collision_effect,0);
 
                     // reset the levels
                     monsterUpdate = 0;
@@ -819,6 +832,7 @@ int main( void )
                     if (glfwGetKey( window, GLFW_KEY_SPACE) == GLFW_PRESS )
                     {
                         // make the audio effect
+                        Mix_PlayChannel(-1,bullet_effect,0);
 
                         // make a bullet object
                         GameObject * bullet = new Bullet(player->getPosition());
@@ -902,6 +916,9 @@ int main( void )
                 if (glfwGetKey( window, GLFW_KEY_F1) == GLFW_PRESS )
                 {
                     showCredits = true;
+
+                    // make sound effect
+                    Mix_PlayChannel(-1,credits_theme,0);
                 }
             }
             else
